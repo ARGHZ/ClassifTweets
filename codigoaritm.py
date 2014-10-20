@@ -1,10 +1,7 @@
-print(__doc__)
 # -*- coding: utf-8 -*-
-'''
-Created on 08/04/2014
+__author__ = 'Juan David Carrillo López'
 
-@author: Juan David Carrillo López
-'''
+from math import log
 
 
 class CodigoAritm(object):
@@ -16,8 +13,8 @@ class CodigoAritm(object):
         """
         Constructor
         """
-        simbs = simbs.split(",")
-        prob_simb = prob_simb.split(",")
+        simbs = simbs.split(" | ")
+        prob_simb = prob_simb.split(" | ")
         if len(simbs) != len(prob_simb):
             raise SimbProbsError(len(simbs), len(prob_simb))
         try:
@@ -63,6 +60,24 @@ class CodigoAritm(object):
                 (inferior, superior)) + '\n'
 
         self.mensaje_base2 = (CodigoAritm.puntodecimalbase2(inferior), CodigoAritm.puntodecimalbase2(superior))
+
+    def ratioabsoluta(self):
+        return log(len(self.simbolos), 2)
+
+    def entropiadelafuente(self):
+        pass
+
+    def entropiadelmensaje(self, msg):
+        sumatoria = 0
+        for s in msg:
+            letra_num = ord(s)
+            try:
+                fila = self.simbolos[letra_num]
+            except KeyError as e:
+                raise ExistSimbError(chr(e.args[0]))
+            prob, x, y = fila
+            sumatoria += prob * log((1/prob),2)
+        return sumatoria
 
     def codificarmensaje(self):
         inf_bits, sup_bits = self.mensaje_base2[0].split(".")[1], self.mensaje_base2[1].split(".")[1]
@@ -149,7 +164,7 @@ class CodigoAritm(object):
 
                     flotante = float("0." + decimales)
 
-                    if iteracion == 32:
+                    if iteracion == 128:
                         break
             except:
                 dec_binario += '0'
@@ -201,24 +216,3 @@ class ItemVacioError(Exception):
 
     def __str__(self):
         return 'Se encontró un elemento vacío al crear el arreglo'
-
-
-if __name__ == '__main__':
-    alfabeto = 'a,b,c,.'
-    probabilidades = '0.2,0.2,0.4,0.2'
-
-    try:
-        inst = CodigoAritm(alfabeto, probabilidades)
-    except SimbProbsError as e:
-        print(e)
-    except ItemVacioError as e:
-        print(e)
-    else:
-        inst.precodmsj("caaacaba.")
-
-        msj_bin, valor_dec = inst.codificarmensaje()
-        print(msj_bin)
-        msj_dec = inst.decodificarmensaje(valor_dec)
-        print(msj_dec)
-    finally:
-        print('Terminando ejecución del programa')
