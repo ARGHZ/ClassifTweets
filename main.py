@@ -14,7 +14,6 @@ if __name__ == '__main__':
     muestreo = np.array([par.split(' | ') for par in muestreo])
     alfabeto = muestreo[:, 0].ravel()
     probabilidades = muestreo[:, 1].ravel()
-
     alfabeto = ' | '.join(alfabeto)
     probabilidades = ' | '.join([str(int(i)/frecuencia_total) for i in probabilidades])
 
@@ -35,12 +34,13 @@ if __name__ == '__main__':
         resultados = []
         for mensaje in mensajes:
             caracteres = NGram(mensaje.split(' '))
-            print('Entropía de \'{0}\': {1}'.format(mensaje, str(inst.entropiadelmensaje(mensaje))))
+            print('\nEntropía de \'{0}\': {1}'.format(mensaje, str(inst.entropiadelmensaje(mensaje))))
+            inst.precodmsj(mensaje+'~')
             for palabrota in lexico:
                 minusculas = palabrota[0].lower()
                 query = caracteres.search(minusculas)
-                if len(query) > 0:
-                    print('\tBuscando >>{0}: {1}'.format(minusculas, query))
-            # resultados.append(minusculas+' --- '+str(inst.entropiadelmensaje(minusculas)))
+                coincidencias = [match for match in query if match[1] > 0.22]
+                if len(coincidencias) > 0:
+                    print('\tBuscando >> {0}: {1}'.format(minusculas, coincidencias))
     finally:
         print('\nTerminando ejecución del programa')

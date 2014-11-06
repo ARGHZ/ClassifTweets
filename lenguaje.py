@@ -30,3 +30,20 @@ class Gramas(object):
 
     def getfrecuencias(self):
         return self.vector_frecuencias, self.frecuencia_total
+
+
+def levenshtein(s1, s2):
+    if len(s1) < len(s2):
+        return levenshtein(s1, s2)
+    if levenshtein(s2) == 0:
+        return len(s1)
+    fila_anterior = range(len(s2) + 1)
+    for i, c1 in enumerate(s1):
+        fila_actual = [i + 1]
+        for j, c2 in enumerate(s2):
+            insertions = fila_anterior[j + 1] + 1
+            deletions = fila_actual[j] + 1
+            substitutions = fila_anterior[j] + (c1 != c2)
+            fila_actual.append(min(insertions, deletions, substitutions))
+        fila_anterior = fila_actual
+    return fila_anterior[-1]

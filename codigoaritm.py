@@ -50,11 +50,11 @@ class CodigoAritm(object):
                 raise ExistSimbError(chr(e.args[0]))
             prob, x, y = fila
 
-            x, y = round(x, 8), round(y, 8)
-            rango = round((superior - inferior), 8)
+            x, y = round(x, 15), round(y, 15)
+            rango = round((superior - inferior), 15)
             pivote = CodigoAritm.liminf(inferior, rango, x)
-            superior = round((CodigoAritm.limsup(inferior, rango, y)), 8)
-            inferior = round(pivote, 8)
+            superior = round((CodigoAritm.limsup(inferior, rango, y)), 15)
+            inferior = round(pivote, 15)
             # print("{0} -|- {1} -|- {2} -|- {3} \n".format(chr(letra_num),rango,(x,y),(inferior,superior)))
             self.tabla['codificar'] += chr(letra_num) + ' -|- ' + str(rango) + ' -|- ' + str((x, y)) + ' -|- ' + str(
                 (inferior, superior)) + '\n'
@@ -63,9 +63,6 @@ class CodigoAritm(object):
 
     def ratioabsoluta(self):
         return log(len(self.simbolos), 2)
-
-    def entropiadelafuente(self):
-        pass
 
     def entropiadelmensaje(self, msg):
         sumatoria = 0
@@ -76,7 +73,7 @@ class CodigoAritm(object):
             except KeyError as e:
                 raise ExistSimbError(chr(e.args[0]))
             prob, x, y = fila
-            sumatoria += prob * log((1/prob),2)
+            sumatoria += prob * log((1/prob), 2)
         return sumatoria
 
     def codificarmensaje(self):
@@ -93,7 +90,7 @@ class CodigoAritm(object):
                 break
 
         n_bin = '0.' + mensaje_bits
-        self.valor = round(CodigoAritm.basediez(n_bin), 6)
+        self.valor = round(CodigoAritm.basediez(n_bin), 15)
         return n_bin, self.valor
 
     def decodificarmensaje(self, valor_decimal):
@@ -104,7 +101,7 @@ class CodigoAritm(object):
         letra_num, intervalo = 0, (0, 0)
 
         while True:
-            cociente = round((valor_decimal - inferior) / (superior - inferior), 8)
+            cociente = round((valor_decimal - inferior) / (superior - inferior), 15)
 
             """Buscando el cociente entre los rangos previamente calculados
             """
@@ -113,8 +110,8 @@ class CodigoAritm(object):
                 if x <= cociente < y:
                     letra_num, intervalo = s, (x, y)
 
-            x, y = round(intervalo[0], 8), round(intervalo[1], 8)
-            rango = round((superior - inferior), 8)
+            x, y = round(intervalo[0], 15), round(intervalo[1], 15)
+            rango = round((superior - inferior), 15)
 
             """ Criterio para determinar cuándo terminar los cálculos
             """
@@ -125,8 +122,8 @@ class CodigoAritm(object):
                 break
 
             pivote = CodigoAritm.liminf(inferior, rango, x)
-            superior = round((CodigoAritm.limsup(inferior, rango, y)), 6)
-            inferior = round(pivote, 6)
+            superior = round((CodigoAritm.limsup(inferior, rango, y)), 15)
+            inferior = round(pivote, 15)
 
         return msg
 

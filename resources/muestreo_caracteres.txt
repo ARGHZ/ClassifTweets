@@ -90,7 +90,7 @@ W | 2
 Ñ | 1
 5 | 1
 ] | 1
-~ | 1
 w | 1
 k | 1
+~ | 1
 Sumatoria de frecuencias: 2060503
