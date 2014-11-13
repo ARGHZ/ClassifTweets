@@ -92,5 +92,16 @@ W | 2
 ] | 1
 w | 1
 k | 1
+@ | 1
+/ | 1
+9 | 1
+K | 1
+_ | 1
+# | 1
+8 | 1
++ | 1
+[ | 1
+& | 1
+* | 1
 ~ | 1
-Sumatoria de frecuencias: 2060503
+Sumatoria de frecuencias: 2060507
