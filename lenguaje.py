@@ -32,6 +32,12 @@ class Gramas(object):
         return self.vector_frecuencias, self.frecuencia_total
 
 
+def contarvocales(string):
+    vowels = "aeiouáéíóú"
+    string = string.lower()
+    return sum(letter in vowels for letter in string)
+
+
 def levenshtein(s1, s2):
     if len(s1) < len(s2):
         return levenshtein(s1, s2)
