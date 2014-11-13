@@ -4,6 +4,7 @@ from ngram import NGram
 from TwitterAPI import TwitterAPI
 import numpy as np
 
+from lenguaje import contarvocales
 from codigoaritm import *
 from utiles import leerarchivo
 
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     access_secret = 'jPVa8ELVIDT2StlNJvts6UmZASllsliVdvHg7VikT88ew'
 
     api = TwitterAPI(consumer_key, consumer_secret, access_key, access_secret)
-    respuesta = api.request('search/tweets', {'q': 'yamecanse', 'count': '100', 'lang': 'es'})
+    respuesta = api.request('search/tweets', {'q': 'abarca', 'count': '100', 'lang': 'es'})
     muestreo = []
     for item in respuesta.get_iterator():
         texto = item['text'].encode('latin-1', 'ignore')
@@ -40,16 +41,13 @@ if __name__ == '__main__':
     except ItemVacioError as e:
         print(e)
     else:
-        mensajes = ('no ests chngndo', 'cmo chgas', 'vt a l hingada', 'nga tv modr', 'chngn',
-                    'chngda mdre', 'p  to', 'pv t05', 'stpid', 'stpdo', 'indiota', 'Piche',
-                    'inche m dre', 'q nches haces!?', 'q pichs!?', 'ndjo', 'ndja', 'ch...',
-                    'chxgx xx madxe')
         mensajes = tuple(muestreo)
 
         for mensaje in mensajes:
             caracteres = NGram(mensaje.split(' '))
             try:
-                print('\nEntropía de \'{0}\': {1}'.format(mensaje, str(inst.entropiadelmensaje(mensaje))))
+                print('\nEntropía de \'{0}\': {1} \nTotal de vocales {2}'
+                      .format(mensaje, str(inst.entropiadelmensaje(mensaje)), contarvocales(mensaje)))
                 inst.precodmsj(mensaje+'~')
             except ExistSimbError as e:
                 print('{0} \t Ignorando mensaje'.format(e))
