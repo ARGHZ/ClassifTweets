@@ -61,4 +61,4 @@ if __name__ == '__main__':
                     if len(coincidencias) > 0:
                         print('\tBuscando >> {0}: {1}'.format(minusculas, coincidencias[0]))
     finally:
-        print('\nTerminando ejecución del programa')
+        print('\nTerminando ejecución del programa...')
