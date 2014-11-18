@@ -2,6 +2,7 @@
 __author__ = 'Juan David Carrillo López'
 from ngram import NGram
 from TwitterAPI import TwitterAPI
+from nltk import word_tokenize
 import numpy as np
 
 from lenguaje import contarvocales
@@ -46,8 +47,9 @@ if __name__ == '__main__':
         for mensaje in mensajes:
             caracteres = NGram(mensaje.split(' '))
             try:
-                print('\nEntropía de \'{0}\': {1} \nTotal de vocales {2}'
-                      .format(mensaje, str(inst.entropiadelmensaje(mensaje)), contarvocales(mensaje)))
+                print('\nEntropía de \'{0}\': {1} \nTotal de vocales: {2} \t Total de palabras: {3}'
+                      .format(mensaje, str(inst.entropiadelmensaje(mensaje)), contarvocales(mensaje),
+                              len(word_tokenize(mensaje))))
                 inst.precodmsj(mensaje+'~')
             except ExistSimbError as e:
                 print('{0} \t Ignorando mensaje'.format(e))
