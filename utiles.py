@@ -47,7 +47,7 @@ def leerarchivo(path_archivo):
     return contenido
 
 
-def guardararchivo(info_arr, path_archivo):
+def guardararchivo(info_arr, path_archivo, modo='w'):
     """
     :param info_arr: Matriz con la información a guardar
     :param path_archivo: Ruta y nombre del archivo
@@ -55,7 +55,7 @@ def guardararchivo(info_arr, path_archivo):
     """
     info_arr, nombre_archivo = tuple(info_arr), path_archivo
 
-    archivo = open(nombre_archivo, 'w')
+    archivo = open(nombre_archivo, modo)
     for renglon in info_arr:
         archivo.write(renglon+'\n')
     archivo.close()
