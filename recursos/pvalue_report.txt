@@ -1,0 +1,789 @@
+#[----------------------------------------------------------------REPORTE----------------------------------------------------------------------]#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+EXPERIMENTACIÓN AL REALIZAR POR 30 ITERACIONES 10-FOLDS CROSS-VALIDATION
+DONDE a ES EL VECTOR DE ACCURACIES DE TAMAÑO 30 clasificador original; DONDE b ES EL VECTOR DE TAMAÑ0 30 clasificador con mejora
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+SET PARA MULTI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.620653333333
+
+Paired t-test
+
+data:  origin and best
+t = -107.79, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.03821833 -0.03679500
+sample estimates:
+mean of the differences 
+            -0.03750667 
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.0.583126666667
+
+Paired t-test
+
+data:  origin and best
+t = 1, df = 29, p-value = 0.3256
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -2.090459e-05  6.090459e-05
+sample estimates:
+mean of the differences 
+                  2e-05
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.676563333333
+
+Paired t-test
+
+data:  origin and best
+t = -2534.8, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.09349204 -0.09334129
+sample estimates:
+mean of the differences 
+            -0.09341667
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.677013333333
+
+Paired t-test
+
+data:  origin and best
+t = -177.27, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.09494967 -0.09278366
+sample estimates:
+mean of the differences 
+            -0.09386667
+
+
+SET PARA BI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.502873563218
+
+Paired t-test
+
+data:  origin and best
+t = -5435.3, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1508534 -0.1507399
+sample estimates:
+mean of the differences 
+             -0.1507967
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.745793333333
+
+Paired t-test
+
+data:  origin and best
+t = -407.8, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1634624 -0.1618309
+sample estimates:
+mean of the differences 
+             -0.1626467 
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.733943333333
+
+Paired t-test
+
+data:  origin and best
+t = -5435.3, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1508534 -0.1507399
+sample estimates:
+mean of the differences 
+             -0.1507967
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.774573333333
+
+Paired t-test
+
+data:  origin and best
+t = -705.68, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1919815 -0.1908719
+sample estimates:
+mean of the differences 
+             -0.1914267
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.779536666667
+
+Paired t-test
+
+data:  origin and best
+t = -479.36, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1972279 -0.1955521
+sample estimates:
+mean of the differences 
+               -0.19639
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> NuSVC RBF degree=2, gamma=0.1, cache_size=300
+	Accuracy = 0.77026
+
+ Paired t-test
+
+data:  origin and best
+t = -562.42, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1877938 -0.1864329
+sample estimates:
+mean of the differences 
+             -0.1871133
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+EXPERIMENTACIÓN AL REALIZAR POR 30 ITERACIONES 10-FOLDS CROSS-VALIDATION CON HYPER PARÁMETROS C = 1000.0 Y GAMMA = 0.001
+DONDE a ES EL VECTOR DE ACCURACIES DE TAMAÑO 30 clasificador original; DONDE b ES EL VECTOR DE TAMAÑ0 30 clasificador con mejora
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+SET PARA MULTI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1000.0, gamma=0.001, cache_size=300
+	Accuracy = 0.58314
+
+Paired t-test
+
+data:  origin and best
+t = 0.24605, df = 29, p-value = 0.8074
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -4.874734e-05  6.208068e-05
+sample estimates:
+mean of the differences 
+           6.666667e-06
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1000.0, gamma=0.001
+	Accuracy = 0.6301
+
+Paired t-test
+
+data:  origin and best
+t = -94.536, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.04796914 -0.04593752
+sample estimates:
+mean of the differences 
+            -0.04695333 
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1000.0, gamma=0.001, cache_size=300
+	Accuracy = 0.58314
+
+Paired t-test
+
+data:  origin and best
+t = 0.24605, df = 29, p-value = 0.8074
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -4.874734e-05  6.208068e-05
+sample estimates:
+mean of the differences 
+           6.666667e-06
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.67657
+
+Paired t-test
+
+data:  origin and best
+t = -2441.7, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.09350159 -0.09334508
+sample estimates:
+mean of the differences 
+            -0.09342333
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.67652
+
+Paired t-test
+
+data:  origin and best
+t = -238.4, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.09417438 -0.09257229
+sample estimates:
+mean of the differences 
+            -0.09337333
+
+
+SET PARA BI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1000.0, gamma=0.001, cache_size=300
+	Accuracy = 0.73396
+
+Paired t-test
+
+data:  origin and best
+t = -5497.8, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1508694 -0.1507572
+sample estimates:
+mean of the differences 
+             -0.1508133
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1000.0, gamma=0.001
+	Accuracy = 0.766843333333
+
+Paired t-test
+
+data:  origin and best
+t = -694.25, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1842378 -0.1831555
+sample estimates:
+mean of the differences 
+             -0.1836967
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1000.0, gamma=0.001, cache_size=300
+	Accuracy = 0.73396
+
+Paired t-test
+
+data:  origin and best
+t = -5497.8, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1508694 -0.1507572
+sample estimates:
+mean of the differences 
+             -0.1508133
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.774083333333
+
+Paired t-test
+
+data:  origin and best
+t = -705.91, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1914899 -0.1903835
+sample estimates:
+mean of the differences 
+             -0.1909367
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.779523333333
+
+Paired t-test
+
+data:  origin and best
+t = -506.36, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1971699 -0.1955835
+sample estimates:
+mean of the differences 
+             -0.1963767
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> NuSVC RBF degree=2, gamma=0.001, cache_size=300
+	Accuracy = 0.755343333333
+
+Paired t-test
+
+data:  origin and best
+t = -56.444, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1784362 -0.1659572
+sample estimates:
+mean of the differences 
+             -0.1721967
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+EXPERIMENTACIÓN AL REALIZAR POR 30 ITERACIONES EasyEnsemble Undersampling CON TODOS LOS CLASIFICADORES INCLUYENDO AL clasificador original
+PERO MANTENIENDO EL VECTOR ANTERIOR DE 10-FOLDS
+DONDE a ES EL VECTOR DE ACCURACIES DE TAMAÑO 30 clasificador original; DONDE b ES EL VECTOR DE TAMAÑ0 30 clasificador con mejora
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+SET PARA MULTI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.511877394636
+
+Paired t-test
+
+data:  origin and best
+t = 3.7211, df = 29, p-value = 0.0008484
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.03209704 0.11044151
+sample estimates:
+mean of the differences 
+             0.07126927
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.540229885057
+
+Paired t-test
+
+data:  origin and best
+t = 5.5137, df = 29, p-value = 6.092e-06
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.02699733 0.05883623
+sample estimates:
+mean of the differences 
+             0.04291678
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.319348659004
+
+Paired t-test
+
+data:  origin and best
+t = 66.717, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.2557112 0.2718848
+sample estimates:
+mean of the differences 
+               0.263798
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.578544061303
+
+Paired t-test
+
+data:  origin and best
+t = 0.30495, df = 29, p-value = 0.7626
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.02626650  0.03547171
+sample estimates:
+mean of the differences 
+            0.004602605
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.527490421456
+
+Paired t-test
+
+data:  origin and best
+t = 4.6045, df = 29, p-value = 7.604e-05
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.03093493 0.08037756
+sample estimates:
+mean of the differences 
+             0.05565625
+
+
+SET PARA BI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.757375478927
+
+Paired t-test
+
+data:  origin and best
+t = -27.118, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1873692 -0.1610884
+sample estimates:
+mean of the differences 
+             -0.1742288
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.736685823755
+
+Paired t-test
+
+data:  origin and best
+t = -15.97, df = 29, p-value = 6.604e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1732029 -0.1338754
+sample estimates:
+mean of the differences 
+             -0.1535392
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.693199233716
+
+Paired t-test
+
+data:  origin and best
+t = -20.338, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.12111970 -0.09898544
+sample estimates:
+mean of the differences 
+             -0.1100526
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.647413793103
+
+Paired t-test
+
+data:  origin and best
+t = -3.6959, df = 29, p-value = 0.0009074
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.09983134 -0.02870292
+sample estimates:
+mean of the differences 
+            -0.06426713
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.614559386973
+
+Paired t-test
+
+data:  origin and best
+t = -2.2899, df = 29, p-value = 0.02949
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.059468655 -0.003356786
+sample estimates:
+mean of the differences 
+            -0.03141272
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> NuSVC RBF degree=2, gamma=0.1, cache_size=300
+	Accuracy = 0.331992337165
+
+Paired t-test
+
+data:  origin and best
+t = 16.785, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.2205508 0.2817578
+sample estimates:
+mean of the differences 
+              0.2511543
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+EXPERIMENTACIÓN AL REALIZAR POR 30 ITERACIONES Random Oversampling CON TODOS LOS CLASIFICADORES INCLUYENDO AL clasificador original
+PERO MANTENIENDO EL VECTOR ANTERIOR DE 10-FOLDS
+DONDE a ES EL VECTOR DE ACCURACIES DE TAMAÑO 30 clasificador original; DONDE b ES EL VECTOR DE TAMAÑ0 30 clasificador con mejora
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+SET PARA MULTI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.622892720307
+
+Paired t-test
+
+data:  origin and best
+t = -8.8666, df = 29, p-value = 9.389e-10
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.0489141 -0.0305780
+sample estimates:
+mean of the differences 
+            -0.03974605
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.604214559387
+
+Paired t-test
+
+data:  origin and best
+t = -3.4582, df = 29, p-value = 0.001701
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.033527630 -0.008608156
+sample estimates:
+mean of the differences 
+            -0.02106789
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.363122605364
+
+Paired t-test
+
+data:  origin and best
+t = 19.255, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.1966532 0.2433949
+sample estimates:
+mean of the differences 
+              0.2200241
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.604406130268
+
+Paired t-test
+
+data:  origin and best
+t = -1.849, df = 29, p-value = 0.07468
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.044775622  0.002256695
+sample estimates:
+mean of the differences 
+            -0.02125946
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.605172413793
+
+Paired t-test
+
+data:  origin and best
+t = -2.799, df = 29, p-value = 0.009021
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.038120250 -0.005931244
+sample estimates:
+mean of the differences 
+            -0.02202575
+
+
+SET PARA BI - CLASE
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.761973180077
+
+Paired t-test
+
+data:  origin and best
+t = -46.904, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1866242 -0.1710289
+sample estimates:
+mean of the differences 
+             -0.1788265
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> SVM RBF degree=2, c=1.0, gamma=0.1
+	Accuracy = 0.734961685824
+
+Paired t-test
+
+data:  origin and best
+t = -19.083, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1680856 -0.1355444
+sample estimates:
+mean of the differences 
+              -0.151815
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> One-vs-Rest Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.705842911877
+
+Paired t-test
+
+data:  origin and best
+t = -19.499, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1355658 -0.1098267
+sample estimates:
+mean of the differences 
+             -0.1226962
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> AdaBoost base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), 
+							learning_rate=0.5, n_estimators=100, algorithm='SAMME'
+	Accuracy = 0.709578544061
+
+Paired t-test
+
+data:  origin and best
+t = -15.38, df = 29, p-value = 1.76e-15
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1432451 -0.1096187
+sample estimates:
+mean of the differences 
+             -0.1264319
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> GradientBoosting n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0
+	Accuracy = 0.705459770115
+
+Paired t-test
+
+data:  origin and best
+t = -18.463, df = 29, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.1358623 -0.1087639
+sample estimates:
+mean of the differences 
+             -0.1223131
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
+clasificador original -> SVM Poly degree=2, c=1.0, gamma=0.1, cache_size=300
+	Accuracy = 0.583146666667
+clasificador mejorado -> NuSVC RBF degree=2, gamma=0.1, cache_size=300
+	Accuracy = 0.538793103448
+
+Paired t-test
+
+data:  origin and best
+t = 7.5592, df = 29, p-value = 2.475e-08
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.03235312 0.05635400
+sample estimates:
+mean of the differences 
+             0.04435356
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------#
