@@ -43,7 +43,7 @@ def guardararchivo(info_arr, path_archivo, modo='w'):
 
     archivo = open(nombre_archivo, modo)
     for renglon in info_arr:
-        archivo.write(renglon+'\n')
+        archivo.write(renglon + '\n')
     archivo.close()
 
 

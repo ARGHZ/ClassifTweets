@@ -1,27 +1,24 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Juan David Carrillo López'
-
 from math import log
 import random
 import re
-import json
 
-from pyexcel_xlsx import XLSXBook, save_data
+from pyexcel_xlsx import XLSXBook
 from ngram import NGram
-from Levenshtein import distance
 from nltk import word_tokenize, pos_tag, bigrams, PorterStemmer, LancasterStemmer, FreqDist
 from nltk.corpus import stopwords
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.multiclass import OneVsRestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.metrics import precision_recall_fscore_support
 from sklearn import svm, cross_validation
-from sklearn.metrics import accuracy_score, classification_report, roc_curve, auc, confusion_matrix
 import numpy as np
+import json
 import matplotlib.pyplot as plt
-import matplotlib.cbook as cbook
 
-from utiles import leerarchivo, contenido_csv, guardar_csv
+from utiles import leerarchivo, guardar_csv, contenido_csv
+
+__author__ = 'Juan David Carrillo López'
 
 
 class TextAnalysis:
@@ -133,12 +130,14 @@ class TextAnalysis:
         count = 0
         for t_word, count_w in ordered_unigrams:
             lower_word = t_word.lower()
-            three_grams = NGram(lexicon)
+            '''three_grams = NGram(lexicon)
             likely_words = three_grams.search(lower_word, 0.5)
-            #  levens_words = [(similar_w, distance(lower_word, similar_w)) for similar_w, ratio in likely_words]
             if len(likely_words) > 0:
-            #if lower_word in lexicon:
+                # if lower_word in lexicon:
                 count += 1 * count_w
+                '''
+            if lower_word in lexicon:
+                count += 1
         return count
 
     def removepunctuals(self, tweet_t):
@@ -221,7 +220,7 @@ class TextAnalysis:
             profane_occur = self.wordsoccurrences(tweet_tokens, option='profane')
             #  print (tfidf_vector, ortony_occur, profane_occur, feat_bigrams, weight)
             new_set.append((sum(tfidf_vector), ortony_occur, profane_occur, sum(feat_bigrams), weight))
-        guardar_csv(new_set, 'recursos/conjuntos.csv')
+        guardar_csv(new_set, 'recursos/orign_conjuntos.csv')
         self.features_space = np.array(new_set)
 
     def learningtoclassify(self, data_set=[]):
@@ -235,100 +234,44 @@ class TextAnalysis:
         #  self.valid_set = self.features_space[int(number_rows*.5)+1:int(number_rows*.8)]
         self.test_set = self.features_space[int(number_rows * .8) + 1:]
 
-        c, gamma, cache_size = 1000.0, 0.001, 300
-        x = min_max_scaler.fit_transform(self.features_space[:, :4])
+        c, gamma, cache_size = 1.0, 0.1, 300
+        x = self.features_space[:, :4]
         y, = self.features_space[:, 4:5].ravel(),
         bin_y = np.array(self.binarizearray(y))
 
-        poly_clf = svm.SVC(kernel='poly', degree=2, C=c, gamma=gamma, cache_size=cache_size)  # , class_weight='auto'
-        rbf_clf = svm.SVC(kernel='rbf', degree=2, gamma=gamma, C=c)
-        ovr_clf = OneVsRestClassifier(poly_clf)
-        #  one_class = svm.OneClassSVM(kernel='poly', gamma=gamma, cache_size=cache_size)
-        #  per_clf = Perceptron(n_iter=250)
-        nu_svc = svm.NuSVC(kernel='rbf', degree=2, gamma=gamma, cache_size=cache_size)
-        adab_clf = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1),
-                                      learning_rate=0.5, n_estimators=100, algorithm='SAMME')
-        gradb_clf = GradientBoostingClassifier(n_estimators=100, learning_rate=0.5, max_depth=1, random_state=0)
-
         kf_total = cross_validation.KFold(len(x), n_folds=10)
-        #  kf_total = cross_validation.ShuffleSplit(len(x), n_iter=10, test_size=0.3)
+        classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
+                       'AdaBoost': AdaBoostClassifier(
+                           base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
+                       n_estimators=100, algorithm='SAMME'),
+                       'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
+                                                                            max_depth=1, random_state=0)}
 
-        general_metrics = {'One-vs-Rest': [], 'NuSVC RBF': [],
-                           'MultiClass Poly-2 SVM': [], 'MultiClass RBF SVM': [],
-                           'AdaBoost DecisionTree': [], 'GradientBoosting': []}
+        general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
 
         ciclo, target_names = 1, ('class 1', 'class 2', 'class 3')
-
-        results = []
         for train_ind, test_ind in kf_total:
-            target_kfold = len(kf_total)
-            scaled_test_set = min_max_scaler.fit_transform(x[test_ind])
+            scaled_test_set = x[test_ind]
             #  print ciclo
-            if ciclo == target_kfold:
-                results.append(np.insert(y[test_ind], 0, 11))
-                results.append(np.insert(bin_y[test_ind], 0, 12))
 
-            ovr_clf.fit(x[train_ind], bin_y[train_ind])
-            y_pred = ovr_clf.predict(scaled_test_set)
-            y_true = bin_y[test_ind]
-            ind_score = ovr_clf.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 13))
-                #  print '{} \n{}'.format('OVR', classification_report(y_true, y_pred))
-            general_metrics['One-vs-Rest'].append((ind_score, 0))
-
-            nu_svc.fit(x[train_ind], bin_y[train_ind])
-            y_pred = nu_svc.predict(scaled_test_set)
-            ind_score = nu_svc.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 14))
-                #  print '{} \n{}'.format('NuSVC', classification_report(y_true, y_pred))
-            general_metrics['NuSVC RBF'].append((ind_score, 0))
-
-            poly_clf.fit(x[train_ind], bin_y[train_ind])
-            y_pred = poly_clf.predict(scaled_test_set)
-            y_true = bin_y[test_ind]
-            ind_score = poly_clf.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 15))
-                #  print '{} \n{}'.format('POLY', classification_report(y_true, y_pred, target_names=target_names))
-            general_metrics['MultiClass Poly-2 SVM'].append((ind_score, 0))
-
-            rbf_clf.fit(x[train_ind], bin_y[train_ind])
-            y_pred = rbf_clf.predict(scaled_test_set)
-            y_true = bin_y[test_ind]
-            ind_score = rbf_clf.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 16))
-                #  print '{} \n{}'.format('RBF', classification_report(y_true, y_pred, target_names=target_names))
-            general_metrics['MultiClass RBF SVM'].append((ind_score, 0))
-
-            adab_clf.fit(x[train_ind], bin_y[train_ind])
-            y_pred = adab_clf.predict(scaled_test_set)
-            y_true = bin_y[test_ind]
-            ind_score = adab_clf.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 17))
-                #  print '{} \n{}'.format('RBF', classification_report(y_true, y_pred, target_names=target_names))
-            general_metrics['AdaBoost DecisionTree'].append((ind_score, 0))
-
-            gradb_clf.fit(x[train_ind], bin_y[train_ind])
-            y_pred = gradb_clf.predict(scaled_test_set)
-            y_true = bin_y[test_ind]
-            ind_score = gradb_clf.fit(x[train_ind], bin_y[train_ind]).score(x[test_ind], bin_y[test_ind])
-            if ciclo == target_kfold:
-                results.append(np.insert(y_pred, 0, 18))
-                #  print '{} \n{}'.format('RBF', classification_report(y_true, y_pred, target_names=target_names))
-            general_metrics['GradientBoosting'].append((ind_score, 0))
+            for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
+                inst_clf = clf.fit(x[train_ind], bin_y[train_ind])
+                y_pred = clf.predict(scaled_test_set)
+                y_true = bin_y[test_ind]
+                ind_score = inst_clf.score(x[test_ind], bin_y[test_ind])
+                general_metrics[clf_name][0].append(ind_score)
+                general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
 
             ciclo += 1
-
         #  results = np.array(results)
         #  guardar_csv(results.T, 'recursos/KFolds.csv')
 
         for clf_name, metrics in general_metrics.items():
-            metrics = np.array(metrics)
-            mean_accuray = round(metrics[:, 0].ravel().mean(), 4)
+            mean_accuray = round(sum(metrics[0]) / len(metrics[0]), 4)
+            metrics = np.array(metrics[1])
+            mean_metrics = {'precision': (metrics[:, 0].mean(), metrics[:, 1].mean()),
+                            'recall': (metrics[:, 2].mean(), metrics[:, 3].mean()),
+                            'f1-score': (metrics[:, 4].mean(), metrics[:, 5].mean())}
             general_metrics[clf_name] = mean_accuray
             # print '{} - {}'.format(clf_name, mean_accuray)
         return general_metrics
@@ -382,33 +325,83 @@ def readexceldata(path_file):
 def plotmetric():
     labels = ('Poly-2', 'AdaBoost', 'GradientB', 'O-v-R', 'RBF', 'NuSVC')
     data = {'multi':
-                ((0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5838, 0.5831, 0.5831),
-                 (0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766, 0.6766, 0.6767, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766),
-                 (0.6789, 0.6823, 0.6777, 0.68, 0.6812, 0.6789, 0.676, 0.6755, 0.6795, 0.6766, 0.6789, 0.6726, 0.6789, 0.6765, 0.68, 0.6812, 0.6737, 0.6783, 0.6737, 0.6737, 0.6738, 0.676, 0.6703, 0.6777, 0.6761, 0.6794, 0.6755, 0.6749, 0.6783, 0.6743),
-                 (0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831),
-                 (0.6216, 0.6198, 0.6187, 0.6227, 0.6221, 0.6193, 0.6227, 0.6238, 0.621, 0.6226, 0.6199, 0.6192, 0.6233, 0.6176, 0.6215, 0.6187, 0.6221, 0.621, 0.6215, 0.6199, 0.6211, 0.621, 0.6209, 0.621, 0.6176, 0.6198, 0.6221, 0.6158, 0.6192, 0.6221)),
+                ((
+                 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831,
+                 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831,
+                 0.5831, 0.5838, 0.5831, 0.5831),
+                 (0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766, 0.6766,
+                  0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766, 0.6766, 0.6767, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766,
+                  0.6766, 0.6766, 0.6766, 0.6766),
+                 (0.6789, 0.6823, 0.6777, 0.68, 0.6812, 0.6789, 0.676, 0.6755, 0.6795, 0.6766, 0.6789, 0.6726, 0.6789,
+                  0.6765, 0.68, 0.6812, 0.6737, 0.6783, 0.6737, 0.6737, 0.6738, 0.676, 0.6703, 0.6777, 0.6761, 0.6794,
+                  0.6755, 0.6749, 0.6783, 0.6743),
+                 (
+                 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831,
+                 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831,
+                 0.5831, 0.5832, 0.5831, 0.5831),
+                 (0.6216, 0.6198, 0.6187, 0.6227, 0.6221, 0.6193, 0.6227, 0.6238, 0.621, 0.6226, 0.6199, 0.6192, 0.6233,
+                  0.6176, 0.6215, 0.6187, 0.6221, 0.621, 0.6215, 0.6199, 0.6211, 0.621, 0.6209, 0.621, 0.6176, 0.6198,
+                  0.6221, 0.6158, 0.6192, 0.6221)),
             'binary':
-                ((0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734, 0.7339, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.734, 0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734),
-                 (0.7764, 0.7752, 0.7746, 0.7741, 0.7741, 0.7758, 0.7724, 0.7724, 0.774, 0.7741, 0.7729, 0.7741, 0.7753, 0.7763, 0.7736, 0.7752, 0.7758, 0.7718, 0.7758, 0.7775, 0.7734, 0.7753, 0.7741, 0.7741, 0.7746, 0.7752, 0.7746, 0.7729, 0.7781, 0.7735),
-                 (0.7827, 0.7804, 0.781, 0.7798, 0.777, 0.7804, 0.781, 0.7781, 0.7792, 0.7827, 0.7798, 0.7798, 0.7804, 0.7798, 0.777, 0.7787, 0.7815, 0.7804, 0.781, 0.7769, 0.7734, 0.7804, 0.7764, 0.777, 0.7827, 0.7815, 0.7816, 0.7775, 0.781, 0.777),
-                 (0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734, 0.7339, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.734, 0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734),
-                 (0.7494, 0.7448, 0.7449, 0.7465, 0.7437, 0.7443, 0.7466, 0.7465, 0.7431, 0.7448, 0.746, 0.7471, 0.75, 0.7437, 0.7489, 0.7448, 0.746, 0.742, 0.7425, 0.7454, 0.7448, 0.7466, 0.7471, 0.7437, 0.7437, 0.7466, 0.7512, 0.7459, 0.7455, 0.7477),
-                 (0.7689, 0.7723, 0.7684, 0.7718, 0.7713, 0.7689, 0.7713, 0.7718, 0.7689, 0.7706, 0.7712, 0.7718, 0.7701, 0.7683, 0.773, 0.7661, 0.7724, 0.7706, 0.7678, 0.7677, 0.7723, 0.7707, 0.77, 0.7689, 0.7712, 0.7712, 0.7735, 0.7689, 0.7684, 0.7695))
-    }
+                ((0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734,
+                  0.7339, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.734, 0.7339, 0.7339, 0.734, 0.7339,
+                  0.734, 0.7339, 0.734, 0.734),
+                 (0.7764, 0.7752, 0.7746, 0.7741, 0.7741, 0.7758, 0.7724, 0.7724, 0.774, 0.7741, 0.7729, 0.7741, 0.7753,
+                  0.7763, 0.7736, 0.7752, 0.7758, 0.7718, 0.7758, 0.7775, 0.7734, 0.7753, 0.7741, 0.7741, 0.7746,
+                  0.7752, 0.7746, 0.7729, 0.7781, 0.7735),
+                 (0.7827, 0.7804, 0.781, 0.7798, 0.777, 0.7804, 0.781, 0.7781, 0.7792, 0.7827, 0.7798, 0.7798, 0.7804,
+                  0.7798, 0.777, 0.7787, 0.7815, 0.7804, 0.781, 0.7769, 0.7734, 0.7804, 0.7764, 0.777, 0.7827, 0.7815,
+                  0.7816, 0.7775, 0.781, 0.777),
+                 (0.7339, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734,
+                  0.7339, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.7339, 0.7339, 0.734, 0.7339, 0.7339, 0.734, 0.7339,
+                  0.734, 0.7339, 0.734, 0.734),
+                 (0.7494, 0.7448, 0.7449, 0.7465, 0.7437, 0.7443, 0.7466, 0.7465, 0.7431, 0.7448, 0.746, 0.7471, 0.75,
+                  0.7437, 0.7489, 0.7448, 0.746, 0.742, 0.7425, 0.7454, 0.7448, 0.7466, 0.7471, 0.7437, 0.7437, 0.7466,
+                  0.7512, 0.7459, 0.7455, 0.7477),
+                 (
+                 0.7689, 0.7723, 0.7684, 0.7718, 0.7713, 0.7689, 0.7713, 0.7718, 0.7689, 0.7706, 0.7712, 0.7718, 0.7701,
+                 0.7683, 0.773, 0.7661, 0.7724, 0.7706, 0.7678, 0.7677, 0.7723, 0.7707, 0.77, 0.7689, 0.7712, 0.7712,
+                 0.7735, 0.7689, 0.7684, 0.7695))
+            }
 
     data2 = {'multi':
-                 ((0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831),
-                  (0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6761, 0.6766, 0.6767, 0.6766, 0.6766, 0.6767, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6767, 0.6766, 0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6765, 0.6766, 0.6766),
-                  (0.676, 0.6737, 0.6778, 0.6755, 0.6749, 0.6772, 0.6766, 0.6795, 0.6755, 0.6749, 0.6778, 0.6766, 0.6783, 0.6789, 0.6738, 0.6761, 0.6784, 0.6749, 0.6817, 0.6732, 0.6778, 0.6714, 0.6766, 0.6749, 0.6778, 0.6795, 0.6766, 0.6765, 0.6754, 0.6778),
-                  (0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831),
-                  (0.6324, 0.6324, 0.6273, 0.6325, 0.6279, 0.6262, 0.6296, 0.6267, 0.6325, 0.6279, 0.6325, 0.6324, 0.6284, 0.6314, 0.629, 0.629, 0.6285, 0.6324, 0.6319, 0.6324, 0.6267, 0.6336, 0.6324, 0.6279, 0.6221, 0.6325, 0.6296, 0.6301, 0.6324, 0.6324)),
+                 ((0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831,
+                   0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832,
+                   0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831),
+                  (0.6766, 0.6766, 0.6766, 0.6766, 0.6766, 0.6761, 0.6766, 0.6767, 0.6766, 0.6766, 0.6767, 0.6766,
+                   0.6766, 0.6766, 0.6766, 0.6766, 0.6767, 0.6766, 0.6766, 0.6766, 0.6766, 0.676, 0.6766, 0.6766,
+                   0.6766, 0.6766, 0.6766, 0.6765, 0.6766, 0.6766),
+                  (
+                  0.676, 0.6737, 0.6778, 0.6755, 0.6749, 0.6772, 0.6766, 0.6795, 0.6755, 0.6749, 0.6778, 0.6766, 0.6783,
+                  0.6789, 0.6738, 0.6761, 0.6784, 0.6749, 0.6817, 0.6732, 0.6778, 0.6714, 0.6766, 0.6749, 0.6778,
+                  0.6795, 0.6766, 0.6765, 0.6754, 0.6778),
+                  (0.5831, 0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5832, 0.5832, 0.5832, 0.5832, 0.5831,
+                   0.5831, 0.5832, 0.5831, 0.5832, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5831, 0.5832,
+                   0.5831, 0.5832, 0.5831, 0.5831, 0.5831, 0.5831),
+                  (0.6324, 0.6324, 0.6273, 0.6325, 0.6279, 0.6262, 0.6296, 0.6267, 0.6325, 0.6279, 0.6325, 0.6324,
+                   0.6284, 0.6314, 0.629, 0.629, 0.6285, 0.6324, 0.6319, 0.6324, 0.6267, 0.6336, 0.6324, 0.6279, 0.6221,
+                   0.6325, 0.6296, 0.6301, 0.6324, 0.6324)),
              'binary':
-                 ((0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.734, 0.7339),
-                  (0.7712, 0.7746, 0.7758, 0.7741, 0.7735, 0.7723, 0.7718, 0.7769, 0.7758, 0.7746, 0.7741, 0.7746, 0.7718, 0.7723, 0.7741, 0.7718, 0.773, 0.7764, 0.7747, 0.7752, 0.7747, 0.7747, 0.7747, 0.773, 0.7741, 0.7764, 0.7741, 0.7735, 0.7735, 0.7752),
-                  (0.781, 0.7821, 0.7821, 0.7827, 0.7793, 0.7775, 0.7741, 0.7786, 0.7815, 0.7775, 0.7798, 0.7815, 0.7798, 0.7787, 0.7787, 0.7787, 0.7764, 0.7804, 0.777, 0.7787, 0.7816, 0.7816, 0.7798, 0.7753, 0.7798, 0.7793, 0.7787, 0.7798, 0.781, 0.7827),
-                  (0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.734, 0.7339),
-                  (0.7672, 0.7672, 0.7672, 0.7672, 0.7673, 0.7672, 0.7609, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7621, 0.7672, 0.7672, 0.7672, 0.7672, 0.7678, 0.7672, 0.7672),
-                  (0.7684, 0.7695, 0.7724, 0.7604, 0.7409, 0.7586, 0.7333, 0.7569, 0.762, 0.7603, 0.7511, 0.7678, 0.7689, 0.7396, 0.7569, 0.7678, 0.7574, 0.7598, 0.738, 0.7672, 0.7494, 0.7586, 0.7534, 0.7804, 0.7143, 0.7063, 0.7689, 0.7408, 0.7684, 0.7626))
+                 ((0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339,
+                   0.734, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.7339,
+                   0.7339, 0.734, 0.7339),
+                  (0.7712, 0.7746, 0.7758, 0.7741, 0.7735, 0.7723, 0.7718, 0.7769, 0.7758, 0.7746, 0.7741, 0.7746,
+                   0.7718, 0.7723, 0.7741, 0.7718, 0.773, 0.7764, 0.7747, 0.7752, 0.7747, 0.7747, 0.7747, 0.773, 0.7741,
+                   0.7764, 0.7741, 0.7735, 0.7735, 0.7752),
+                  (
+                  0.781, 0.7821, 0.7821, 0.7827, 0.7793, 0.7775, 0.7741, 0.7786, 0.7815, 0.7775, 0.7798, 0.7815, 0.7798,
+                  0.7787, 0.7787, 0.7787, 0.7764, 0.7804, 0.777, 0.7787, 0.7816, 0.7816, 0.7798, 0.7753, 0.7798, 0.7793,
+                  0.7787, 0.7798, 0.781, 0.7827),
+                  (0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339, 0.7339,
+                   0.734, 0.734, 0.734, 0.734, 0.734, 0.734, 0.7339, 0.734, 0.7339, 0.734, 0.734, 0.734, 0.734, 0.7339,
+                   0.7339, 0.734, 0.7339),
+                  (0.7672, 0.7672, 0.7672, 0.7672, 0.7673, 0.7672, 0.7609, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672,
+                   0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7672, 0.7621, 0.7672,
+                   0.7672, 0.7672, 0.7672, 0.7678, 0.7672, 0.7672),
+                  (
+                  0.7684, 0.7695, 0.7724, 0.7604, 0.7409, 0.7586, 0.7333, 0.7569, 0.762, 0.7603, 0.7511, 0.7678, 0.7689,
+                  0.7396, 0.7569, 0.7678, 0.7574, 0.7598, 0.738, 0.7672, 0.7494, 0.7586, 0.7534, 0.7804, 0.7143, 0.7063,
+                  0.7689, 0.7408, 0.7684, 0.7626))
              }
     #  stats = cbook.boxplot_stats(np.array(data['multi']).T)
     plt.subplot()
@@ -416,25 +409,34 @@ def plotmetric():
     plt.show()
 
 
-if __name__ == '__main__':
+def getnewdataset():
+    with open('recursos/bullyingV3/tweet.json') as json_file:
+        for line in json_file:
+            json_data = (json.loads(line)['id'], str(json.loads(line)['text']))
+    return json_data
+
+
+def preprocessdataset():
+    first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
+    prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
+    ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
+
+    anlys = TextAnalysis(first_filter, ortony_words, prof_word)
+    anlys.hashtagsdirectedrtweets()
+    anlys.featuresextr()
+
+
+def machinelearning():
     first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
 
     prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
     ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
 
-    '''with open('recursos/bullyingV3/tweet.json') as json_file:
-        for line in json_file:
-            json_data = (json.loads(line)['id'], str(json.loads(line)['text']))
-    '''
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
-    anlys.hashtagsdirectedrtweets()
-    anlys.featuresextr()
-    '''
     data = contenido_csv('recursos/conjuntos.csv')
 
-    general_accuracy = {'One-vs-Rest': [], 'NuSVC RBF': [], 'MultiClass Poly-2 SVM': [], 'MultiClass RBF SVM': [],
-                        'AdaBoost DecisionTree': [], 'GradientBoosting': []}
-    for cicle in range(30):
+    general_accuracy = {'MultiClass Poly-2 SVM': [], 'AdaBoost DecisionTree': [], 'GradientBoosting': []}
+    for cicle in range(1):
         accuracies = anlys.learningtoclassify(np.array(data, dtype='f'))
         print 'Iter {} results {}'.format((cicle + 1), accuracies)
         for clf_name, mean_acc in accuracies.items():
@@ -443,14 +445,6 @@ if __name__ == '__main__':
         mean_acc = np.array(vect_accu).mean()
         print '{} {} -> {}'.format(clf_name, mean_acc, vect_accu)
 
-    plotmetric()
-    filtro = first_filter[:, 1].ravel()
-    print rangos
-    print np.bincount(np.array(filtro, dtype=np.int32))
 
-    n, bins, patches, = plt.hist(np.array(filtro, dtype=np.int32), normed=1, facecolor='green', alpha=0.5)
-    plt.xlabel('Weighting')
-    plt.ylabel('Probability')
-    plt.title('Histogram')
-    plt.show()
-    '''
+if __name__ == '__main__':
+    machinelearning()
