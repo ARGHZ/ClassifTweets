@@ -261,9 +261,9 @@ class TextAnalysis:
         x = min_max_scaler.fit_transform(self.training_set[:, :4])
         '''y = self.training_set[:, 4:5].ravel()
         y_true = self.test_set[:, 4:5].ravel()
-        '''
-        easyens = EasyEnsemble(verbose=True)
 
+        easyens = EasyEnsemble(verbose=True)
+        '''
         for type_clf in type_classifier.keys():
             if type_clf == 'multi':
                 y = self.training_set[:, 4:5].ravel()
@@ -271,7 +271,7 @@ class TextAnalysis:
             else:
                 y = self.binarizearray(self.training_set[:, 4:5].ravel())
                 y_true = self.binarizearray(self.test_set[:, 4:5].ravel())
-
+            easyens = EasyEnsemble(verbose=True)
             eex, eey = easyens.fit_transform(x, y)
 
             ciclo, target_names = 0, ('class 1', 'class 2', 'class 3')
