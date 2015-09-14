@@ -94,7 +94,7 @@ class TextAnalysis:
             else:
                 elem = 0
             new_array.append(elem)
-        return new_array
+        return tuple(new_array)
 
     @staticmethod
     def numpytotuple(arr):
@@ -235,55 +235,40 @@ class TextAnalysis:
         self.test_set = self.features_space[int(number_rows * .8) + 1:]
 
         c, gamma, cache_size = 1.0, 0.1, 300
-        x = self.features_space[:, :4]
-        y, = self.features_space[:, 4:5].ravel(),
-        bin_y = np.array(self.binarizearray(y))
 
-        kf_total = cross_validation.KFold(len(x), n_folds=10)
         classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
                        'AdaBoost': AdaBoostClassifier(
                            base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
                        n_estimators=100, algorithm='SAMME'),
                        'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
-                                                                            max_depth=1, random_state=0)}
+                                                                      max_depth=1, random_state=0)}
 
-        general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+        #  general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+        type_classifier = {'multi': None, 'binary': None}
 
-        ciclo, target_names = 1, ('class 1', 'class 2', 'class 3')
-        for train_ind, test_ind in kf_total:
-            scaled_test_set = x[test_ind]
-            #  print ciclo
+        x = self.features_space[:, :4]
+        kf_total = cross_validation.KFold(len(x), n_folds=10)
+        for type_clf in type_classifier.keys():
+            general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+            if type_clf == 'binary':
+                y = np.array(self.binarizearray(self.features_space[:, 4:5].ravel()))
+            else:
+                y = self.features_space[:, 4:5].ravel()
 
-            for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
-                inst_clf = clf.fit(x[train_ind], bin_y[train_ind])
-                y_pred = clf.predict(scaled_test_set)
-                y_true = bin_y[test_ind]
-                ind_score = inst_clf.score(x[test_ind], bin_y[test_ind])
-                general_metrics[clf_name][0].append(ind_score)
-                general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
-
-            ciclo += 1
-        #  results = np.array(results)
-        #  guardar_csv(results.T, 'recursos/KFolds.csv')
-
-        for clf_name, metrics in general_metrics.items():
-            mean_accuray = round(sum(metrics[0]) / len(metrics[0]), 4)
-            metrics = np.array(metrics[1])
-            mean_metrics = {'precision': (metrics[:, 0].mean(), metrics[:, 1].mean()),
-                            'recall': (metrics[:, 2].mean(), metrics[:, 3].mean()),
-                            'f1-score': (metrics[:, 4].mean(), metrics[:, 5].mean())}
-            general_metrics[clf_name] = mean_accuray
-            # print '{} - {}'.format(clf_name, mean_accuray)
-        return general_metrics
-
-    def getoriginalset(self):
-        return self.raw_tweets
-
-    def getfilteredset(self):
-        return self.new_tweetset
-
-    def getfeatures(self):
-        return self.features_space
+            for train_ind, test_ind in kf_total:
+                scaled_test_set = x[test_ind]
+                for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
+                    inst_clf = clf.fit(x[train_ind], y[train_ind])
+                    y_pred = clf.predict(scaled_test_set)
+                    y_true = y[test_ind]
+                    ind_score = inst_clf.score(x[test_ind], y[test_ind])
+                    general_metrics[clf_name][0].append(ind_score)
+                    general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+            #  guardar_csv(results.T, 'recursos/KFolds.csv')
+            for clf_name in classifiers.keys():
+                general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
+            type_classifier[type_clf] = general_metrics
+        return type_classifier
 
 
 class ValorNuloError(Exception):
@@ -435,15 +420,13 @@ def machinelearning():
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     data = contenido_csv('recursos/conjuntos.csv')
 
-    general_accuracy = {'MultiClass Poly-2 SVM': [], 'AdaBoost DecisionTree': [], 'GradientBoosting': []}
+    general_info = {'Poly-2 Kernel': [], 'AdaBoost': [], 'GradientBoosting': []}
     for cicle in range(1):
-        accuracies = anlys.learningtoclassify(np.array(data, dtype='f'))
-        print 'Iter {} results {}'.format((cicle + 1), accuracies)
-        for clf_name, mean_acc in accuracies.items():
-            general_accuracy[clf_name].append(mean_acc)
-    for clf_name, vect_accu in general_accuracy.items():
-        mean_acc = np.array(vect_accu).mean()
-        print '{} {} -> {}'.format(clf_name, mean_acc, vect_accu)
+        result_info = anlys.learningtoclassify(np.array(data, dtype='f'))
+        print 'Iter {}'.format(cicle + 1)
+        for clf_name, information in result_info.items():
+            general_info[clf_name].append(information)
+    print general_info
 
 
 if __name__ == '__main__':
