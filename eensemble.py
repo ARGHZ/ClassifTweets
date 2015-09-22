@@ -251,7 +251,7 @@ class TextAnalysis:
         classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
                        'AdaBoost': AdaBoostClassifier(
                            base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
-                       n_estimators=100, algorithm='SAMME'),
+                           n_estimators=100, algorithm='SAMME'),
                        'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
                                                                             max_depth=1, random_state=0)}
         prediction = {'Poly-2 Kernel': [], 'AdaBoost': [], 'GradientBoosting': []}

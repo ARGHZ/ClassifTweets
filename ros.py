@@ -96,14 +96,6 @@ class TextAnalysis:
 
     @staticmethod
     def binarizearray(temp_array):
-        new_array = []
-        '''for elem in temp_array:
-            if elem == 3:
-                elem = 1
-            else:
-                elem = 0
-            new_array.append(elem)
-        '''
         binarizer = Binarizer(threshold=2.0)
         new_array = binarizer.transform(temp_array)[0]
 
@@ -118,7 +110,6 @@ class TextAnalysis:
             for class_label, n_times in item_counts:
                 if n_times > max_times:
                     last_class, max_times = class_label, n_times
-            #print 'feature {} class voted {} - {}'.format(col_index, class_label, n_times)
             index_outputs.append((col_index, class_label))
         return np.array(index_outputs)
 
@@ -153,7 +144,7 @@ class TextAnalysis:
             likely_words = three_grams.search(lower_word, 0.5)
             #  levens_words = [(similar_w, distance(lower_word, similar_w)) for similar_w, ratio in likely_words]
             if len(likely_words) > 0:
-            #if lower_word in lexicon:
+            #  if lower_word in lexicon:
                 count += 1 * count_w
         return count
 
@@ -256,29 +247,19 @@ class TextAnalysis:
         y = self.training_set[:, 4:5].ravel()
         y_true = self.test_set[:, 4:5].ravel()
 
-        '''classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
-                       'RBF Kernel': svm.SVC(kernel='rbf', C=c, gamma=gamma),
-                       'One vs Rest RBF Kernel': OneVsRestClassifier(svm.SVC(kernel='linear')),
+        classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
                        'AdaBoost': AdaBoostClassifier(
                            base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
-                       n_estimators=100, algorithm='SAMME'),
+                           n_estimators=100, algorithm='SAMME'),
                        'GradientBoosting Class': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
                                                                             max_depth=1, random_state=0)}
-        y_classifier = {'Poly-2 Kernel': [], 'RBF Kernel': [], 'One vs Rest RBF Kernel': [],
-                        'AdaBoost': [], 'GradientBoosting Class': []}
-                        '''
-        general_metrics = {'Poly-2 Kernel': [], 'RBF Kernel': [], 'AdaBoost': [], 'GradientBoosting Class': [],
-                           'One vs Rest RBF Kernel': [], 'NuSVC RBF': []}
+        y_classifier = {'Poly-2 Kernel': [], 'AdaBoost': [], 'GradientBoosting Class': []}
+        general_metrics = {'Poly-2 Kernel': [], 'AdaBoost': [], 'GradientBoosting Class': []}
 
-        '''print('Random over-sampling')
-        ovsampling = OverSampler(verbose=False)
+        ovsampling = OverSampler(verbose=True)
         eex, eey = ovsampling.fit_transform(x, y)
 
-        results = []
         ciclo, target_names = 0, ('class 1', 'class 2', 'class 3')
-        results.append(np.insert(y_true, 0, 110))
-        #  for train_ind, test_ind in kf_total:
-        #for i_ee in range(len(eex)):
 
         scaled_test_set = min_max_scaler.fit_transform(self.test_set[:, :4])
         #  print 'Subset {}'.format(ciclo)
@@ -295,56 +276,10 @@ class TextAnalysis:
 
             mean_accuray = accuracy_score(y_true, all_ypred[:, 1].ravel())
             general_metrics[clf_name] = mean_accuray
-            '''
-        bin_y = np.array(self.binarizearray(y))
-        y_true = self.binarizearray(self.test_set[:, 4:5].ravel())
-        print('Random over-sampling')
-        ovsampling = OverSampler(verbose=False)
-        eex, eey = ovsampling.fit_transform(x, bin_y)
-
-        classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
-                       'RBF Kernel': svm.SVC(kernel='rbf', C=c, gamma=gamma),
-                       'One vs Rest RBF Kernel': OneVsRestClassifier(svm.SVC(kernel='linear')),
-                       'AdaBoost': AdaBoostClassifier(
-                           base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
-                       n_estimators=100, algorithm='SAMME'),
-                       'GradientBoosting Class': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
-                                                                            max_depth=1, random_state=0),
-                       'NuSVC RBF': svm.NuSVC(kernel='rbf', degree=2, gamma=gamma, cache_size=cache_size)}
-        y_classifier = {'Poly-2 Kernel': [], 'RBF Kernel': [], 'One vs Rest RBF Kernel': [],
-                        'AdaBoost': [], 'GradientBoosting Class': [],
-                        'NuSVC RBF': []}
-        ciclo = 0
-        #results.append(np.insert(y_true, 0, 120))
-        #  for i_ee in range(len(eex)):
-
-        scaled_test_set = min_max_scaler.fit_transform(self.test_set[:, :4])
-        #  print 'Subset {}'.format(ciclo)
-        for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
-            clf.fit(eex, eey)
-            y_pred = clf.predict(scaled_test_set)
-            y_classifier[clf_name].append(y_pred)
-        ciclo += 1
-
-        for clf_name, output in y_classifier.items():
-            all_ypred = np.array(output, dtype=int)
-            all_ypred = self.votingoutputs(all_ypred)
-
-            mean_accuray = accuracy_score(y_true, all_ypred[:, 1].ravel())
-            general_metrics[clf_name] = mean_accuray
 
         #results = np.array(results)
         #guardar_csv(results.T, 'recursos/EE_sampling.csv')
         return general_metrics
-
-    def getoriginalset(self):
-        return self.raw_tweets
-
-    def getfilteredset(self):
-        return self.new_tweetset
-
-    def getfeatures(self):
-        return self.features_space
 
 
 class ValorNuloError(Exception):
@@ -404,28 +339,37 @@ def plotmetric():
     plt.show()
 
 
-if __name__ == '__main__':
-    '''first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
+def getnewdataset():
+    with open('recursos/bullyingV3/tweet.json') as json_file:
+        for line in json_file:
+            json_data = (json.loads(line)['id'], str(json.loads(line)['text']))
+    return json_data
+
+
+def preprocessdataset():
+    first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
+    prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
+    ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
+
+    anlys = TextAnalysis(first_filter, ortony_words, prof_word)
+    anlys.hashtagsdirectedrtweets()
+    anlys.featuresextr()
+
+
+def machinelearning():
+    first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
 
     prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
     ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
 
-    with open('recursos/bullyingV3/tweet.json') as json_file:
-        for line in json_file:
-            json_data = (json.loads(line)['id'], str(json.loads(line)['text']))
-
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
-    # anlys.hasgtagsdirectedrtweets()
-    #  anlys.featuresextr()
     data = contenido_csv('recursos/conjuntos.csv')
-    general_accuracy = {'Poly-2 Kernel': [], 'RBF Kernel': [], 'AdaBoost': [], 'GradientBoosting Class': [],
-                        'One vs Rest RBF Kernel': [], 'NuSVC RBF': []}
-    for cicle in range(30):
-        accuracies = anlys.learningtoclassify(np.array(data, dtype='f'))
-        for clf_name, mean_acc in accuracies.items():
-            general_accuracy[clf_name].append(mean_acc)
-    for clf_name, vect_accu in general_accuracy.items():
-        mean_acc = np.array(vect_accu).mean()
-        print '{} {} -> {}'.format(clf_name, mean_acc, vect_accu)
-        '''
-    plotmetric()
+
+    general_accuracy = {'MultiClass Poly-2 SVM': [], 'AdaBoost DecisionTree': [], 'GradientBoosting': []}
+    for cicle in range(1):
+        result_info = anlys.learningtoclassify(np.array(data, dtype='f'))
+        print 'Iter {} results {}'.format((cicle + 1), result_info)
+
+
+if __name__ == '__main__':
+    machinelearning()
