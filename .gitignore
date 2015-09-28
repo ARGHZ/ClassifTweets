@@ -45,4 +45,4 @@ Temporary Items
 # Compiled bytecode of Python
 # ============================
 
-*.py[cod]
+*.pyc
