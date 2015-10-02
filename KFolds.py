@@ -15,8 +15,10 @@ from sklearn import svm, cross_validation
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+import eensemble as undersampling
+import ros as oversampling
 
-from utiles import leerarchivo, guardar_csv, contenido_csv
+from utiles import leerarchivo, guardar_csv, contenido_csv, binarizearray
 
 __author__ = 'Juan David Carrillo López'
 
@@ -84,17 +86,6 @@ class TextAnalysis:
                 tweets_match += 1
         result = log((self.new_tweetset.shape[0] / tweets_match), 10)
         return result
-
-    @staticmethod
-    def binarizearray(temp_array):
-        new_array = []
-        for elem in temp_array:
-            if elem == 3:
-                elem = 1
-            else:
-                elem = 0
-            new_array.append(elem)
-        return tuple(new_array)
 
     @staticmethod
     def numpytotuple(arr):
@@ -205,7 +196,7 @@ class TextAnalysis:
 
         self.new_tweetset = np.array(new_set)
 
-    def featuresextr(self):
+    def featuresextr(self, set_name='featurespace.csv'):
         new_set = []
         for tweet_tokens, features, weight in self.new_tweetset:  # features are pending till performance methodoly
             #  print '\n{}'.format(tweet_tokens)
@@ -220,55 +211,8 @@ class TextAnalysis:
             profane_occur = self.wordsoccurrences(tweet_tokens, option='profane')
             #  print (tfidf_vector, ortony_occur, profane_occur, feat_bigrams, weight)
             new_set.append((sum(tfidf_vector), ortony_occur, profane_occur, sum(feat_bigrams), weight))
-        guardar_csv(new_set, 'recursos/orign_conjuntos.csv')
+        guardar_csv(new_set, 'recursos/{}'.format(set_name))
         self.features_space = np.array(new_set)
-
-    def learningtoclassify(self, data_set=[]):
-        if len(data_set) > 0:
-            self.features_space = data_set
-        number_rows = self.features_space.shape[0]
-        np.random.shuffle(self.features_space)
-        min_max_scaler = MinMaxScaler()
-
-        self.training_set = self.features_space[:int(number_rows * .8)]
-        #  self.valid_set = self.features_space[int(number_rows*.5)+1:int(number_rows*.8)]
-        self.test_set = self.features_space[int(number_rows * .8) + 1:]
-
-        c, gamma, cache_size = 1.0, 0.1, 300
-
-        classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
-                       'AdaBoost': AdaBoostClassifier(
-                           base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
-                       n_estimators=100, algorithm='SAMME'),
-                       'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
-                                                                      max_depth=1, random_state=0)}
-
-        #  general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
-        type_classifier = {'multi': None, 'binary': None}
-
-        x = self.features_space[:, :4]
-        kf_total = cross_validation.KFold(len(x), n_folds=10)
-        for type_clf in type_classifier.keys():
-            general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
-            if type_clf == 'binary':
-                y = np.array(self.binarizearray(self.features_space[:, 4:5].ravel()))
-            else:
-                y = self.features_space[:, 4:5].ravel()
-
-            for train_ind, test_ind in kf_total:
-                scaled_test_set = x[test_ind]
-                for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
-                    inst_clf = clf.fit(x[train_ind], y[train_ind])
-                    y_pred = clf.predict(scaled_test_set)
-                    y_true = y[test_ind]
-                    ind_score = inst_clf.score(x[test_ind], y[test_ind])
-                    general_metrics[clf_name][0].append(ind_score)
-                    general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
-            #  guardar_csv(results.T, 'recursos/KFolds.csv')
-            for clf_name in classifiers.keys():
-                general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
-            type_classifier[type_clf] = general_metrics
-        return type_classifier
 
 
 class ValorNuloError(Exception):
@@ -408,26 +352,67 @@ def preprocessdataset():
 
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     anlys.hashtagsdirectedrtweets()
-    anlys.featuresextr()
+    anlys.featuresextr('ngrams_set.csv')
+
+
+def learningtoclassify(i_iter='', data_set=[]):
+    features_space = data_set
+    number_rows = features_space.shape[0]
+    np.random.shuffle(features_space)
+    min_max_scaler = MinMaxScaler()
+
+    training_set = features_space[:int(number_rows * .8)]
+    #  valid_set = features_space[int(number_rows*.5)+1:int(number_rows*.8)]
+    test_set = features_space[int(number_rows * .8) + 1:]
+
+    c, gamma, cache_size = 1.0, 0.1, 300
+
+    classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
+                   'AdaBoost': AdaBoostClassifier(
+                       base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
+                   n_estimators=100, algorithm='SAMME'),
+                   'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
+                                                                  max_depth=1, random_state=0)}
+
+    type_classifier = {'multi': None, 'binary': None}
+
+    x = features_space[:, :4]
+    kf_total = cross_validation.KFold(len(x), n_folds=10)
+    for type_clf in type_classifier.keys():
+        general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+        if type_clf == 'binary':
+            y = np.array(binarizearray(features_space[:, 4:5].ravel()))
+        else:
+            y = features_space[:, 4:5].ravel()
+
+        for train_ind, test_ind in kf_total:
+            scaled_test_set = x[test_ind]
+            for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
+                inst_clf = clf.fit(x[train_ind], y[train_ind])
+                y_pred = clf.predict(scaled_test_set)
+                y_true = y[test_ind]
+                ind_score = inst_clf.score(x[test_ind], y[test_ind])
+                general_metrics[clf_name][0].append(ind_score)
+                general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+
+        for clf_name in classifiers.keys():
+            results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
+                                      np.array(general_metrics[clf_name][1])), axis=1)
+            guardar_csv(results, 'recursos/resultados/{}_kfolds_{}_{}.csv'.format(type_clf, clf_name, i_iter))
+            general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
+        type_classifier[type_clf] = general_metrics
+    return type_classifier
 
 
 def machinelearning():
-    first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
-
-    prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
-    ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
-
-    anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     data = contenido_csv('recursos/conjuntos.csv')
 
-    general_info = {'Poly-2 Kernel': [], 'AdaBoost': [], 'GradientBoosting': []}
-    for cicle in range(1):
-        result_info = anlys.learningtoclassify(np.array(data, dtype='f'))
-        print 'Iter {}'.format(cicle + 1)
-        for clf_name, information in result_info.items():
-            general_info[clf_name].append(information)
-    print general_info
+    for cicle in range(30):
+        learningtoclassify(cicle + 1, np.array(data, dtype='f'))
 
 
 if __name__ == '__main__':
     machinelearning()
+    undersampling.machinelearning()
+    oversampling.machinelearning()
+    #  preprocessdataset()
