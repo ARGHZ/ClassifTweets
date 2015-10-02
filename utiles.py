@@ -1,9 +1,36 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Juan David Carrillo López'
-
 import csv
 import socket
 import SocketServer
+
+import numpy as np
+from scipy.stats import itemfreq
+
+__author__ = 'Juan David Carrillo López'
+
+
+def votingoutputs(temp_array):
+    index_outputs = []
+    for col_index in range(temp_array.shape[1]):
+        item_counts = itemfreq(temp_array[:, col_index])
+        max_times = 0
+        for class_label, n_times in item_counts:
+            if n_times > max_times:
+                last_class, max_times = class_label, n_times
+        #print 'feature {} class voted {} - {}'.format(col_index, class_label, n_times)
+        index_outputs.append((col_index, class_label))
+    return np.array(index_outputs)
+
+
+def binarizearray(temp_array):
+    new_array = []
+    for elem in temp_array:
+        if elem == 3:
+            elem = 1
+        else:
+            elem = 0
+        new_array.append(elem)
+    return tuple(new_array)
 
 
 def leerarchivo(path_archivo):
