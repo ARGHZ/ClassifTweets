@@ -43,6 +43,4 @@ Temporary Items
 .apdisk
 
 # Compiled bytecode of Python
-# ============================
-
 *.pyc
