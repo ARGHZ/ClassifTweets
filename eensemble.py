@@ -16,7 +16,7 @@ __author__ = 'Juan David Carrillo López'
 def learningtoclassify(n_iter=1, data_set=[]):
     features_space = data_set
     number_rows = features_space.shape[0]
-
+    print '\titeration: {}'.format(n_iter)
     c, gamma, cache_size = 1.0, 0.1, 300
 
     classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
@@ -73,11 +73,6 @@ def learningtoclassify(n_iter=1, data_set=[]):
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
             guardar_csv(results, 'recursos/resultados/{}_eensemble_{}.csv'.format(type_clf, clf_name))
-            general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
-        type_classifier[type_clf] = general_metrics
-    #  End type_class iteration
-
-    return type_classifier
 
 
 def plotmetric():
@@ -102,8 +97,9 @@ def plotmetric():
 
 
 def machinelearning():
-    data = contenido_csv('recursos/conjuntos.csv')
-
+    data = contenido_csv('recursos/nongrams.csv')
+    print '\n--------------------------------------->>>>   EASY ENSEMBLE UNDERSAMPLING   ' \
+          '<<<<-------------------------------------------'
     learningtoclassify(30, np.array(data, dtype='f'))
 
 

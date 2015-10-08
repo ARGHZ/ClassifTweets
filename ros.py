@@ -75,9 +75,6 @@ def learningtoclassify(n_iter=1, data_set=[]):
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
             guardar_csv(results, 'recursos/resultados/{}_ros_{}.csv'.format(type_clf, clf_name))
-            general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
-        type_classifier[type_clf] = general_metrics
-    return type_classifier
 
 
 def readexceldata(path_file):
@@ -137,9 +134,10 @@ def getnewdataset():
 
 
 def machinelearning():
-    data = contenido_csv('recursos/conjuntos.csv')
-
-    result_info = learningtoclassify(30, np.array(data, dtype='f'))
+    data = contenido_csv('recursos/nongrams.csv')
+    print '\n--------------------------------------->>>>   RANDOM OVERSAMPLING   ' \
+          '<<<<-------------------------------------------'
+    learningtoclassify(30, np.array(data, dtype='f'))
 
 
 if __name__ == '__main__':

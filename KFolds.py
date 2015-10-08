@@ -15,6 +15,8 @@ from sklearn import svm, cross_validation
 import numpy as np
 import json
 import matplotlib.pyplot as plt
+
+import gridsearch as searchparam
 import eensemble as undersampling
 import ros as oversampling
 
@@ -357,13 +359,13 @@ def preprocessdataset():
 
 def learningtoclassify(i_iter='', data_set=[]):
     features_space = data_set
-    number_rows = features_space.shape[0]
+
     np.random.shuffle(features_space)
     min_max_scaler = MinMaxScaler()
-
-    training_set = features_space[:int(number_rows * .8)]
+    print '\titeration: {}'.format(i_iter)
+    #  training_set = features_space[:int(number_rows * .8)]
     #  valid_set = features_space[int(number_rows*.5)+1:int(number_rows*.8)]
-    test_set = features_space[int(number_rows * .8) + 1:]
+    #  test_set = features_space[int(number_rows * .8) + 1:]
 
     c, gamma, cache_size = 1.0, 0.1, 300
 
@@ -373,40 +375,42 @@ def learningtoclassify(i_iter='', data_set=[]):
                    n_estimators=100, algorithm='SAMME'),
                    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
                                                                   max_depth=1, random_state=0)}
-
     type_classifier = {'multi': None, 'binary': None}
 
-    x = features_space[:, :4]
-    kf_total = cross_validation.KFold(len(x), n_folds=10)
-    for type_clf in type_classifier.keys():
-        general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
-        if type_clf == 'binary':
-            y = np.array(binarizearray(features_space[:, 4:5].ravel()))
+    for improve in ('base', 'parameters'):
+        if improve == 'base':
+            x = features_space[:, :4]
         else:
-            y = features_space[:, 4:5].ravel()
+            x = min_max_scaler.fit_transform(features_space[:, :4])
 
-        for train_ind, test_ind in kf_total:
-            scaled_test_set = x[test_ind]
-            for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
-                inst_clf = clf.fit(x[train_ind], y[train_ind])
-                y_pred = clf.predict(scaled_test_set)
-                y_true = y[test_ind]
-                ind_score = inst_clf.score(x[test_ind], y[test_ind])
-                general_metrics[clf_name][0].append(ind_score)
-                general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+        kf_total = cross_validation.KFold(len(x), n_folds=10)
+        for type_clf in type_classifier.keys():
+            general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+            if type_clf == 'binary':
+                y = np.array(binarizearray(features_space[:, 4:5].ravel()))
+            else:
+                y = features_space[:, 4:5].ravel()
 
-        for clf_name in classifiers.keys():
-            results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
-                                      np.array(general_metrics[clf_name][1])), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}_kfolds_{}_{}.csv'.format(type_clf, clf_name, i_iter))
-            general_metrics[clf_name][1] = np.array(general_metrics[clf_name][1])
-        type_classifier[type_clf] = general_metrics
-    return type_classifier
+            for train_ind, test_ind in kf_total:
+                scaled_test_set = x[test_ind]
+                for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
+                    inst_clf = clf.fit(x[train_ind], y[train_ind])
+                    y_pred = clf.predict(scaled_test_set)
+                    y_true = y[test_ind]
+                    ind_score = inst_clf.score(x[test_ind], y[test_ind])
+                    general_metrics[clf_name][0].append(ind_score)
+                    general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+
+            for clf_name in classifiers.keys():
+                results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
+                                          np.array(general_metrics[clf_name][1])), axis=1)
+                guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
+                            format(improve, type_clf, clf_name, i_iter))
 
 
 def machinelearning():
-    data = contenido_csv('recursos/conjuntos.csv')
-
+    data = contenido_csv('recursos/nongrams.csv')
+    print '\n---------------------------------------->>>>   10-FOLDS   <<<<--------------------------------------------'
     for cicle in range(30):
         learningtoclassify(cicle + 1, np.array(data, dtype='f'))
 
