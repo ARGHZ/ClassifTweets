@@ -134,7 +134,7 @@ def getnewdataset():
 
 
 def machinelearning():
-    data = contenido_csv('recursos/nongrams.csv')
+    data = contenido_csv('recursos/ngrams.csv')
     print '\n--------------------------------------->>>>   RANDOM OVERSAMPLING   ' \
           '<<<<-------------------------------------------'
     learningtoclassify(30, np.array(data, dtype='f'))
