@@ -97,7 +97,7 @@ def plotmetric():
 
 
 def machinelearning():
-    data = contenido_csv('recursos/nongrams.csv')
+    data = contenido_csv('recursos/ngrams.csv')
     print '\n--------------------------------------->>>>   EASY ENSEMBLE UNDERSAMPLING   ' \
           '<<<<-------------------------------------------'
     learningtoclassify(30, np.array(data, dtype='f'))

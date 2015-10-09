@@ -16,7 +16,7 @@ import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-import gridsearch as searchparam
+import gridsearch
 import eensemble as undersampling
 import ros as oversampling
 
@@ -354,7 +354,7 @@ def preprocessdataset():
 
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     anlys.hashtagsdirectedrtweets()
-    anlys.featuresextr('ngrams_set.csv')
+    anlys.featuresextr('nongrams.csv')
 
 
 def learningtoclassify(i_iter='', data_set=[]):
@@ -369,8 +369,7 @@ def learningtoclassify(i_iter='', data_set=[]):
 
     c, gamma, cache_size = 1.0, 0.1, 300
 
-    classifiers = {'Poly-2 Kernel': svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size),
-                   'AdaBoost': AdaBoostClassifier(
+    classifiers = {'AdaBoost': AdaBoostClassifier(
                        base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
                    n_estimators=100, algorithm='SAMME'),
                    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
@@ -381,7 +380,8 @@ def learningtoclassify(i_iter='', data_set=[]):
         if improve == 'base':
             x = features_space[:, :4]
         else:
-            x = min_max_scaler.fit_transform(features_space[:, :4])
+            x = min_max_scaler.fit_transform(features_space)
+            best_param = gridsearch.searchinghparameters(features_space[:, :])
 
         kf_total = cross_validation.KFold(len(x), n_folds=10)
         for type_clf in type_classifier.keys():
@@ -390,6 +390,11 @@ def learningtoclassify(i_iter='', data_set=[]):
                 y = np.array(binarizearray(features_space[:, 4:5].ravel()))
             else:
                 y = features_space[:, 4:5].ravel()
+
+            if improve == 'base':
+                classifiers['Poly-2 Kernel'] = svm.SVC(kernel='poly', degree=2, C=c, cache_size=cache_size)
+            else:
+                classifiers['Poly-2 Kernel'] = svm.SVC(best_param[type_clf])
 
             for train_ind, test_ind in kf_total:
                 scaled_test_set = x[test_ind]
@@ -404,19 +409,22 @@ def learningtoclassify(i_iter='', data_set=[]):
             for clf_name in classifiers.keys():
                 results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                           np.array(general_metrics[clf_name][1])), axis=1)
-                guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
+                '''guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
                             format(improve, type_clf, clf_name, i_iter))
+                            '''
 
 
 def machinelearning():
-    data = contenido_csv('recursos/nongrams.csv')
+    data = contenido_csv('recursos/ngrams.csv')
     print '\n---------------------------------------->>>>   10-FOLDS   <<<<--------------------------------------------'
     for cicle in range(30):
         learningtoclassify(cicle + 1, np.array(data, dtype='f'))
 
 
 if __name__ == '__main__':
+    #  preprocessdataset()
     machinelearning()
     undersampling.machinelearning()
     oversampling.machinelearning()
+
     #  preprocessdataset()
