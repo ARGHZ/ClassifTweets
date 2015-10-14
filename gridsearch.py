@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from sklearn import svm, cross_validation
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.grid_search import GridSearchCV
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.metrics import precision_recall_fscore_support
+from sklearn import svm, cross_validation
 from sklearn.metrics import classification_report
 import numpy as np
 
-from utiles import contenido_csv, binarizearray
+from utiles import contenido_csv, guardar_csv, binarizearray
 
 __author__ = 'Juan David Carrillo López'
 
@@ -13,8 +16,7 @@ __author__ = 'Juan David Carrillo López'
 def searchinghparameters(features_space):
     np.random.shuffle(features_space)
     min_max_scaler = MinMaxScaler()
-    print '\n--------------------------------------->>>>   SEARCHING HYPERPARAMETERS   ' \
-          '<<<<-------------------------------------------'
+
     X = min_max_scaler.fit_transform(features_space[:, :4])
 
     type_classifier = {'multi': None, 'binary': None}
@@ -47,3 +49,57 @@ def searchinghparameters(features_space):
             y_true, y_pred = y_test, clf.predict(x_test)
             print classification_report(y_true, y_pred)
     return type_classifier
+
+
+def learningtoclassify(n_iter=1, data_set=[]):
+    features_space = data_set
+    np.random.shuffle(features_space)
+    min_max_scaler = MinMaxScaler()
+
+    new_params = searchinghparameters(data_set)
+    for i_iter in range(n_iter):
+        print '\titeration: {}'.format(i_iter)
+        #  training_set = features_space[:int(number_rows * .8)]
+        #  valid_set = features_space[int(number_rows*.5)+1:int(number_rows*.8)]
+        #  test_set = features_space[int(number_rows * .8) + 1:]
+
+        type_classifier = {'multi': None, 'binary': None}
+
+        x = min_max_scaler.fit_transform(features_space[:, :4])
+
+        kf_total = cross_validation.KFold(len(x), n_folds=10)
+        for type_clf in type_classifier.keys():
+            classifiers = {'Poly-2 Kernel': svm.SVC(**new_params[type_clf]), }
+            general_metrics = {'Poly-2 Kernel': [[], []], }
+            if type_clf == 'binary':
+                y = np.array(binarizearray(features_space[:, 4:5].ravel()))
+            else:
+                y = features_space[:, 4:5].ravel()
+
+            for train_ind, test_ind in kf_total:
+                scaled_test_set = x[test_ind]
+                for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
+                    inst_clf = clf.fit(x[train_ind], y[train_ind])
+                    y_pred = clf.predict(scaled_test_set)
+                    y_true = y[test_ind]
+                    ind_score = inst_clf.score(x[test_ind], y[test_ind])
+                    general_metrics[clf_name][0].append(ind_score)
+                    general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+
+            for clf_name in classifiers.keys():
+                results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
+                                          np.array(general_metrics[clf_name][1])), axis=1)
+                guardar_csv(results, 'recursos/resultados/{}_hparamt_{}_{}.csv'.
+                            format(type_clf, clf_name, i_iter))
+
+
+def machinelearning():
+    print '\n--------------------------------------->>>>   SEARCHING HYPERPARAMETERS   ' \
+          '<<<<-------------------------------------------'
+    data = contenido_csv('recursos/ngrams.csv')
+    features_space = np.array(data, dtype='f')
+    learningtoclassify(30, features_space)
+
+
+if __name__ == '__main__':
+    machinelearning()
