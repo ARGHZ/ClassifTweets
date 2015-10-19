@@ -82,7 +82,7 @@ def guardar_csv(data, path_archivo):
     :return:
     """
     with open(path_archivo, 'wb') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
         for line in data:
             writer.writerow(line)
 
