@@ -153,8 +153,9 @@ class TextAnalysis:
             return list_word
 
     def hashtagsdirectedrtweets(self):
-        new_set = []
+        new_set, text_data = [], []
         for text, weight in self.raw_tweets:
+            raw_text, class_text = text, weight
             text = text.split(' ')
             features = [0, 0]
             for caracter in self.caracteres:
@@ -191,10 +192,11 @@ class TextAnalysis:
 
             try:
                 stemw_tweet = self.removeunimportantseq(stemw_tweet)
+                text_data.append((raw_text, class_text))
                 new_set.append((tuple(stemw_tweet), features, int(weight)))
             except ValorNuloError, e:
                 print 'Descartando tweet -> {}'.format(e)
-
+        guardar_csv(text_data, 'recursos/resultados/tweets_and_classes.csv')
         self.new_tweetset = np.array(new_set)
 
     def featuresextr(self, set_name='featurespace.csv'):
@@ -212,7 +214,7 @@ class TextAnalysis:
             profane_occur = self.wordsoccurrences(tweet_tokens, option='profane')
             #  print (tfidf_vector, ortony_occur, profane_occur, feat_bigrams, weight)
             new_set.append((sum(tfidf_vector), ortony_occur, profane_occur, sum(feat_bigrams), weight))
-        guardar_csv(new_set, 'recursos/{}'.format(set_name))
+        #  guardar_csv(new_set, 'recursos/{}'.format(set_name))
         self.features_space = np.array(new_set)
 
 
@@ -227,12 +229,12 @@ class ValorNuloError(Exception):
 def readexceldata(path_file):
     book = XLSXBook(path_file)
     content = book.sheets()
-    data_set = np.array(content['filtro'])[:2326, :7]
+    data_set = np.array(content['filtro'][1:2326])
     filtro = np.array([row for row in data_set if row[6] <= 2])
-    n_filas, n_columnas = filtro.shape
+    n_filas = filtro.shape[0]
 
     rangos, filtro2 = [0, 0, 0], []
-    for row in filtro[:n_filas - 4, :]:
+    for row in filtro[:n_filas - 4]:
         if row[6] == 2:
             valor_selecc = int((row[1] + row[2]) / 2)
         else:
@@ -411,10 +413,9 @@ def machinelearning():
 
 
 if __name__ == '__main__':
-    #  preprocessdataset()
-    machinelearning()
+    preprocessdataset()
+    '''machinelearning()
     gridsearch.machinelearning()
     undersampling.machinelearning()
     oversampling.machinelearning()
-
-    #  preprocessdataset()
+    '''
