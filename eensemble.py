@@ -13,7 +13,7 @@ from utiles import contenido_csv, guardar_csv, votingoutputs, binarizearray
 __author__ = 'Juan David Carrillo López'
 
 
-def learningtoclassify(n_iter=1, data_set=[]):
+def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
     features_space = data_set
     number_rows = features_space.shape[0]
     print '\titeration: {}'.format(n_iter)
@@ -34,7 +34,7 @@ def learningtoclassify(n_iter=1, data_set=[]):
         for i_iter in range(n_iter):
             np.random.shuffle(features_space)
             min_max_scaler = MinMaxScaler()
-
+            print '\titeration: {}'.format(i_iter + 1)
             training_set = features_space[:int(number_rows * .8)]
             #  valid_set = features_space[int(number_rows*.5)+1:int(number_rows*.8)]
             test_set = features_space[int(number_rows * .8) + 1:]
@@ -72,7 +72,7 @@ def learningtoclassify(n_iter=1, data_set=[]):
             array_a = np.atleast_2d(np.array(general_metrics[clf_name][0])).reshape((30, 1))
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}_eensemble_{}.csv'.format(type_clf, clf_name))
+            guardar_csv(results, 'recursos/resultados/{}/{}_eensemble_{}.csv'.format(type_dataset, type_clf, clf_name))
 
 
 def plotmetric():
@@ -96,12 +96,8 @@ def plotmetric():
     plt.show()
 
 
-def machinelearning():
-    data = contenido_csv('recursos/ngrams.csv')
+def machinelearning(type_set):
+    data = contenido_csv('recursos/{}.csv'.format(type_set))
     print '\n--------------------------------------->>>>   EASY ENSEMBLE UNDERSAMPLING   ' \
           '<<<<-------------------------------------------'
-    learningtoclassify(30, np.array(data, dtype='f'))
-
-
-if __name__ == '__main__':
-    machinelearning()
+    learningtoclassify(type_set, 30, np.array(data, dtype='f'))

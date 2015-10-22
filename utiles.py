@@ -17,7 +17,7 @@ def votingoutputs(temp_array):
         for class_label, n_times in item_counts:
             if n_times > max_times:
                 last_class, max_times = class_label, n_times
-        #print 'feature {} class voted {} - {}'.format(col_index, class_label, n_times)
+        #  print 'feature {} class voted {} - {}'.format(col_index, class_label, n_times)
         index_outputs.append((col_index, class_label))
     return np.array(index_outputs)
 
@@ -82,7 +82,7 @@ def guardar_csv(data, path_archivo):
     :return:
     """
     with open(path_archivo, 'wb') as csv_file:
-        writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+        writer = csv.writer(csv_file, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for line in data:
             writer.writerow(line)
 
@@ -135,7 +135,7 @@ class MyTCPHandler(SocketServer.BaseRequestHandler):
     
     def handle(self):
         datos = self.request.recv(4096).strip()
-        #print("{0} wrote:".format(self.client_address[0]))
+        #  print("{0} wrote:".format(self.client_address[0]))
         print(str(datos, "utf-8"))
         
         # self.request es el TCP socket conectado al cliente

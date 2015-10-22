@@ -51,14 +51,14 @@ def searchinghparameters(features_space):
     return type_classifier
 
 
-def learningtoclassify(n_iter=1, data_set=[]):
+def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
     features_space = data_set
     np.random.shuffle(features_space)
     min_max_scaler = MinMaxScaler()
 
     new_params = searchinghparameters(data_set)
     for i_iter in range(n_iter):
-        print '\titeration: {}'.format(i_iter)
+        print '\titeration: {}'.format(i_iter + 1)
         #  training_set = features_space[:int(number_rows * .8)]
         #  valid_set = features_space[int(number_rows*.5)+1:int(number_rows*.8)]
         #  test_set = features_space[int(number_rows * .8) + 1:]
@@ -89,17 +89,13 @@ def learningtoclassify(n_iter=1, data_set=[]):
             for clf_name in classifiers.keys():
                 results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                           np.array(general_metrics[clf_name][1])), axis=1)
-                guardar_csv(results, 'recursos/resultados/{}_hparamt_{}_{}.csv'.
-                            format(type_clf, clf_name, i_iter))
+                guardar_csv(results, 'recursos/resultados/{}/{}_hparamt_{}_{}.csv'.
+                            format(type_dataset, type_clf, clf_name, i_iter+1))
 
 
-def machinelearning():
+def machinelearning(type_set):
     print '\n--------------------------------------->>>>   SEARCHING HYPERPARAMETERS   ' \
           '<<<<-------------------------------------------'
-    data = contenido_csv('recursos/ngrams.csv')
+    data = contenido_csv('recursos/{}.csv'.format(type_set))
     features_space = np.array(data, dtype='f')
-    learningtoclassify(30, features_space)
-
-
-if __name__ == '__main__':
-    machinelearning()
+    learningtoclassify(type_set, 30, features_space)

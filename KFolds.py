@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from math import log
+from time import time
 import random
 import re
 
@@ -358,7 +359,7 @@ def preprocessdataset():
     anlys.featuresextr('nongrams.csv')
 
 
-def learningtoclassify(i_iter='', data_set=[]):
+def learningtoclassify(t_dataset, i_iter='', data_set=[]):
     features_space = data_set
 
     np.random.shuffle(features_space)
@@ -400,22 +401,22 @@ def learningtoclassify(i_iter='', data_set=[]):
         for clf_name in classifiers.keys():
             results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                       np.array(general_metrics[clf_name][1])), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}_kfolds_{}_{}.csv'.
-                        format(type_clf, clf_name, i_iter))
+            guardar_csv(results, 'recursos/resultados/{}/{}_kfolds_{}_{}.csv'.
+                        format(t_dataset, type_clf, clf_name, i_iter))
 
 
-def machinelearning():
-    data = contenido_csv('recursos/ngrams.csv')
+def machinelearning(type_set):
+    data = contenido_csv('recursos/{}.csv'.format(type_set))
     print '\n---------------------------------------->>>>   10-FOLDS   <<<<--------------------------------------------'
     print '\n------------------------------------>>>>   NO NORMALISATION   <<<<----------------------------------------'
     for cicle in range(30):
-        learningtoclassify(cicle + 1, np.array(data, dtype='f'))
+        learningtoclassify(type_set, cicle + 1, np.array(data, dtype='f'))
 
 
 if __name__ == '__main__':
-    preprocessdataset()
-    '''machinelearning()
-    gridsearch.machinelearning()
-    undersampling.machinelearning()
-    oversampling.machinelearning()
-    '''
+    #  preprocessdataset()
+    t_data = 'nongrams'
+    machinelearning(t_data)
+    gridsearch.machinelearning(t_data)
+    undersampling.machinelearning(t_data)
+    oversampling.machinelearning(t_data)

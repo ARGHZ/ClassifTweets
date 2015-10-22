@@ -30,7 +30,7 @@ def votingoutputs(temp_array):
     return np.array(index_outputs)
 
 
-def learningtoclassify(n_iter=1, data_set=[]):
+def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
     features_space = data_set
     number_rows = features_space.shape[0]
 
@@ -49,7 +49,7 @@ def learningtoclassify(n_iter=1, data_set=[]):
         for i_iter in range(n_iter):
             np.random.shuffle(features_space)
             min_max_scaler = MinMaxScaler()
-
+            print '\titeration: {}'.format(i_iter + 1)
             training_set = features_space[:int(number_rows * .8)]
             test_set = features_space[int(number_rows * .8) + 1:]
             x = min_max_scaler.fit_transform(training_set[:, :4])
@@ -74,7 +74,7 @@ def learningtoclassify(n_iter=1, data_set=[]):
             array_a = np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1)
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}_ros_{}.csv'.format(type_clf, clf_name))
+            guardar_csv(results, 'recursos/resultados/{}/{}_ros_{}.csv'.format(type_dataset, type_clf, clf_name))
 
 
 def readexceldata(path_file):
@@ -133,12 +133,8 @@ def getnewdataset():
     return json_data
 
 
-def machinelearning():
-    data = contenido_csv('recursos/ngrams.csv')
+def machinelearning(type_set):
+    data = contenido_csv('recursos/{}.csv'.format(type_set))
     print '\n--------------------------------------->>>>   RANDOM OVERSAMPLING   ' \
           '<<<<-------------------------------------------'
-    learningtoclassify(30, np.array(data, dtype='f'))
-
-
-if __name__ == '__main__':
-    machinelearning()
+    learningtoclassify(type_set, 30, np.array(data, dtype='f'))
