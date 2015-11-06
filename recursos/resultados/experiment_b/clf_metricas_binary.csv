@@ -1,0 +1,20 @@
+ngrams_binary_ros_Poly-2 Kernel,0.763697,0.604699,0.414862,0.478994
+ngrams_binary_ros_AdaBoost,0.734291,0.0,0.0,0.0
+ngrams_binary_ros_GradientBoosting,0.70431,0.473298,0.619706,0.52619
+ngrams_binary_eensemble_Poly-2 Kernel,0.348563,0.292836,0.910739,0.430777
+ngrams_binary_eensemble_AdaBoost,0.594828,0.324712,0.366329,0.3042
+ngrams_binary_eensemble_GradientBoosting,0.296073,0.276795,0.980731,0.429323
+ngrams_binary_hparamt_Poly-2 Kernel,0.733882,0.0,0.0,0.0
+ngrams_binary_kfolds_Poly-2 Kernel,0.763366,0.702495,0.201317,0.307892
+ngrams_binary_kfolds_AdaBoost,0.780148,0.684578,0.318879,0.424391
+ngrams_binary_kfolds_GradientBoosting,0.779663,0.649653,0.374588,0.47188
+nongrams_binary_ros_Poly-2 Kernel,0.75249,0.578315,0.543275,0.527669
+nongrams_binary_ros_AdaBoost,0.727107,0.0,0.0,0.0
+nongrams_binary_ros_GradientBoosting,0.737835,0.516575,0.609082,0.557032
+nongrams_binary_eensemble_Poly-2 Kernel,0.335057,0.294268,0.941276,0.439337
+nongrams_binary_eensemble_AdaBoost,0.490326,0.326254,0.628249,0.393894
+nongrams_binary_eensemble_GradientBoosting,0.3,0.281225,0.980647,0.434476
+nongrams_binary_hparamt_Poly-2 Kernel,0.73225,0.0,0.0,0.0
+nongrams_binary_kfolds_Poly-2 Kernel,0.773062,0.718908,0.248808,0.366533
+nongrams_binary_kfolds_AdaBoost,0.773081,0.720267,0.248123,0.365906
+nongrams_binary_kfolds_GradientBoosting,0.770121,0.639206,0.332419,0.432302
