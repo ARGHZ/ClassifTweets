@@ -89,7 +89,7 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
             for clf_name in classifiers.keys():
                 results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                           np.array(general_metrics[clf_name][1])), axis=1)
-                guardar_csv(results, 'recursos/resultados/{}/{}_hparamt_{}_{}.csv'.
+                guardar_csv(results, 'recursos/resultados/{}_{}_hparamt_{}_{}.csv'.
                             format(type_dataset, type_clf, clf_name, i_iter+1))
 
 

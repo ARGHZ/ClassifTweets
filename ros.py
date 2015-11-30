@@ -74,7 +74,7 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
             array_a = np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1)
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}/{}_ros_{}.csv'.format(type_dataset, type_clf, clf_name))
+            guardar_csv(results, 'recursos/resultados/{}_{}_ros_{}.csv'.format(type_dataset, type_clf, clf_name))
 
 
 def readexceldata(path_file):

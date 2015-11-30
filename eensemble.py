@@ -72,7 +72,7 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
             array_a = np.atleast_2d(np.array(general_metrics[clf_name][0])).reshape((30, 1))
             array_b = np.array(general_metrics[clf_name][1])
             results = np.concatenate((array_a, array_b), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}/{}_eensemble_{}.csv'.format(type_dataset, type_clf, clf_name))
+            guardar_csv(results, 'recursos/resultados/{}_{}_eensemble_{}.csv'.format(type_dataset, type_clf, clf_name))
 
 
 def plotmetric():

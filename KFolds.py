@@ -20,7 +20,7 @@ import gridsearch
 import eensemble as undersampling
 import ros as oversampling
 
-from utiles import leerarchivo, guardar_csv, contenido_csv, binarizearray
+from utiles import leerarchivo, guardararchivo, guardar_csv, contenido_csv, binarizearray
 
 __author__ = 'Juan David Carrillo López'
 
@@ -154,9 +154,10 @@ class TextAnalysis:
             return list_word
 
     def hashtagsdirectedrtweets(self):
-        new_set, text_data = [], []
+        process_tweets, new_set, text_data = [], [], []
         for text, weight in self.raw_tweets:
             raw_text, class_text = text, weight
+            process_tweets.append('Raw text: {}'.format(raw_text))
             text = text.split(' ')
             features = [0, 0]
             for caracter in self.caracteres:
@@ -184,20 +185,24 @@ class TextAnalysis:
                     text.insert(index_match, '')
                     features[0] = 1
             text = self.replacepronounscontractiosn(' '.join(text))
-
+            process_tweets.append('\treplace pronouns/contractions: {}'.format(text))
             word_list = word_tokenize(self.removepunctuals(text))
+            process_tweets.append('\tremove punctuals: {}'.format(word_list))
             word_list = [self.stemaposphe(w) for w in word_list]
+            process_tweets.append('\tremove aposthrophe: {}'.format(word_list))
             stopw_tweet = self.removestopwords(word_list)
-
+            process_tweets.append('\tremove stopwords: {}'.format(stopw_tweet))
             stemw_tweet = self.stemmingword(stopw_tweet)
-
+            process_tweets.append('\tstemming words: {}'.format(stemw_tweet))
             try:
                 stemw_tweet = self.removeunimportantseq(stemw_tweet)
+                process_tweets.append('\tremove unimportant sequences: {}\n'.format(stemw_tweet))
                 text_data.append((raw_text, class_text))
                 new_set.append((tuple(stemw_tweet), features, int(weight)))
             except ValorNuloError, e:
                 print 'Descartando tweet -> {}'.format(e)
-        guardar_csv(text_data, 'recursos/resultados/tweets_and_classes.csv')
+        #  guardar_csv(text_data, 'recursos/resultados/tweets_and_classes.csv')
+        guardararchivo(process_tweets, 'recursos/resultados/processing_tweets.txt')
         self.new_tweetset = np.array(new_set)
 
     def featuresextr(self, set_name='featurespace.csv'):
@@ -350,13 +355,13 @@ def getnewdataset():
 
 
 def preprocessdataset():
-    first_filter = np.array(readexceldata('recursos/conjuntos.xlsx'))
+    first_filter = np.array(readexceldata('recursos/ponderacion/conjuntos.xlsx'))
     prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
     ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
 
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     anlys.hashtagsdirectedrtweets()
-    anlys.featuresextr('nongrams.csv')
+    #  anlys.featuresextr('nongrams.csv')
 
 
 def learningtoclassify(t_dataset, i_iter='', data_set=[]):
@@ -401,7 +406,7 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[]):
         for clf_name in classifiers.keys():
             results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                       np.array(general_metrics[clf_name][1])), axis=1)
-            guardar_csv(results, 'recursos/resultados/{}/{}_kfolds_{}_{}.csv'.
+            guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
                         format(t_dataset, type_clf, clf_name, i_iter))
 
 
@@ -414,9 +419,10 @@ def machinelearning(type_set):
 
 
 if __name__ == '__main__':
-    #  preprocessdataset()
-    t_data = 'nongrams'
+    preprocessdataset()
+    '''t_data = 'ngrams'
     machinelearning(t_data)
     gridsearch.machinelearning(t_data)
     undersampling.machinelearning(t_data)
     oversampling.machinelearning(t_data)
+    '''
