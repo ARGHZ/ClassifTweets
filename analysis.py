@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import random
+import os
+
+from pyexcel_xlsx import XLSXBook
+from statsmodels.stats.weightstats import ttest_ind
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -6,6 +11,8 @@ import pandas as pd
 from utiles import contenido_csv, guardar_csv
 
 __author__ = 'Juan David Carrillo López'
+
+SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 
 def saveandjoin30iter(type_dataset):
@@ -99,6 +106,120 @@ def structuriseresults(type_dataset):
     print 'fin'
 
 
+def showresultstatistics():
+    '''book = XLSXBook('recursos/ponderacion/conjuntos.xlsx')
+    content = book.sheets()
+    data_set = []
+
+    for row in content['filtro'][1:]:
+        data_set.append((int(row[1]), int(row[2])))
+
+    guardar_csv(data_set, 'recursos/resultados/evaluated_data.csv')
+    '''
+    data_set = np.concatenate((np.array(contenido_csv('recursos/resultados/evaluated_data.csv'), dtype=np.int32),
+                               np.array(contenido_csv('recursos/resultados/weighted_data.csv'), dtype=np.int32)),
+                              axis=1)
+    main_data, added_data = data_set[:2000, :], data_set[2000:, :]
+
+    filtro = np.array([row for row in data_set if row[3] <= 2])
+    rangos_3 = []
+    for valor_selecc in filtro[:, 2]:
+        if valor_selecc < 4:
+            rangos_3.append(1)
+        elif valor_selecc > 6:
+            rangos_3.append(3)
+        else:
+            rangos_3.append(2)
+
+    font = {'family': 'serif', 'color': 'darkred', 'weight': 'normal', 'size': 16}
+
+    '''print 'Dataset \n\t ev_1 {} \n\t ev_2: {}'.format(np.bincount(main_data[:, 0]), np.bincount(main_data[:, 1]))
+    plt.hist(main_data[:, 0], color='g', label='Evaluador 1', alpha=0.4)
+    plt.hist(main_data[:, 1], color='y', label='Evaluador 2', alpha=0.4)
+    plt.title(u'Titulo del gráfico')
+    plt.xlabel(u'Escala de Ponderación')
+    plt.ylabel('Cantidad de muestras')
+    plt.xticks([i + 0.5 for i in range(10)], [j + 1 for j in range(10)])
+    plt.legend(loc='upper right')
+    #  plt.show()
+    plt.savefig('recursos/charts/hist_dataset.jpeg')
+    plt.close()'''
+    print 'Added data \n\t ev_1 {} \n\t ev_2: {}'.format(np.bincount(added_data[:, 0]), np.bincount(added_data[:, 1]))
+    plt.hist(added_data[:, 0], color='g', label='Evaluador 1', alpha=0.4)
+    plt.hist(added_data[:, 1], color='y', label='Evaluador 2', alpha=0.4)
+    plt.title(u'Titulo del gráfico')
+    plt.xlabel(u'Escala de Ponderación')
+    #  plt.xticks([i + 0.5 for i in range(10)], [j + 1 for j in range(10)])
+    plt.legend(loc='upper right')
+    plt.show()
+    '''plt.savefig('recursos/charts/hist_addedset.jpeg')
+    plt.close()
+    print 'Filtro <= 2: \n\t ev_1 {} \n\t ev_2: {}'.format(np.bincount(filtro[:, 0]), np.bincount(filtro[:, 1]))
+    plt.hist(filtro[:, 0], color='g', label='Evaluador 1', alpha=0.4)
+    plt.hist(filtro[:, 1], color='y', label='Evaluador 2', alpha=0.4)
+    plt.title(u'Titulo del gráfico')
+    plt.xlabel(u'Escala de Ponderación')
+    plt.xticks([i + 0.5 for i in range(10)], [j + 1 for j in range(10)])
+    plt.legend(loc='upper right')
+    plt.savefig('recursos/charts/hist_filtro.jpeg')
+    plt.close()
+    print 'Final counting \n\t {}'.format(np.bincount(filtro[:, 2]))
+    plt.hist(filtro[:, 2], color='y', alpha=0.4)
+    plt.title(u'Titulo del gráfico')
+    plt.xlabel(u'Escala de Ponderación')
+    plt.xticks([i + 0.5 for i in range(10)], [j + 1 for j in range(10)])
+    plt.legend(loc='upper right')
+    plt.savefig('recursos/charts/hist_finalcounting.jpeg')
+    plt.close()
+    print '3-class counting \n\t {}'.format(np.bincount(rangos_3))
+    plt.hist(filtro[:, 2], color='y', alpha=0.4, bins=3)
+    plt.title(u'Titulo del gráfico')
+    plt.xlabel(u'Escala de Ponderación')
+    plt.xticks([i + 0.5 for i in range(10)], [j + 1 for j in range(10)])
+    plt.legend(loc='upper right')
+    plt.savefig('recursos/charts/hist_3-class.jpeg')
+    plt.close()
+    '''
+    datasets, methods, classes, classifiers = ('ngrams', 'nongrams'), ('kfolds', 'eensemble', 'ros', 'hparamt'),\
+                                              ('binary', 'multi'), ('Poly-2 Kernel', 'AdaBoost', 'GradientBoosting')
+    all_metrics = {}
+    for type_data in datasets:
+        for class_type in classes:
+            for method in methods:
+                for clf in classifiers:
+                    try:
+                        clasifier_name = '{}_{}_{}_{}'.format(type_data, class_type, method, clf)
+                        all_metrics[clasifier_name] = (contenido_csv('recursos/resultados/experiment_a/{}/{}_{}_{}.csv'.
+                                                       format(type_data, class_type, method, clf)))
+                    except IOError as e:
+                        pass
+                    else:
+                        print '{}/recursos/resultados/experiment_a/{}/{}_{}_{}'.\
+                            format(SITE_ROOT, type_data, class_type, method, clf)
+    fscore_idx = {'binary': [5, 6], 'multi': [7, 8, 9]}
+    for class_type in classes:
+        base_clf_name = 'nongrams_{}_kfolds_Poly-2 Kernel'.format(class_type)
+        base_clf = np.array(all_metrics[base_clf_name], dtype='f')[:, fscore_idx[class_type]]
+        print base_clf_name
+        '''for ith_col in range(base_clf.shape[1]):
+            print '\tclass {} -- {}'.format(ith_col + 1, ','.join(base_clf[:, ith_col].ravel()))
+            '''
+        for clasifier_name in all_metrics.keys():
+            if clasifier_name != base_clf_name and class_type in clasifier_name:
+                current_clf = np.array(all_metrics[clasifier_name], dtype='f')[:, fscore_idx[class_type]]
+                print '\n\t{}'.format(clasifier_name)
+                for ith_col in range(current_clf.shape[1]):
+                    stats_result = ttest_ind(base_clf[:, ith_col].ravel(), current_clf[:, ith_col].ravel())
+                    msg_result = '\tclass {} -- test statisic: {} \tpvalue of the t-test: {} ' \
+                                 '\tdegrees of freedom used in the t-test: {}'.\
+                        format(ith_col + 1, stats_result[0], stats_result[1], stats_result[2])
+                    if stats_result[1] > 0.05:
+                        msg_result += ' P-value mayor a 0.05'
+                    print msg_result
+                    #  print '\tclass {} -- {}\n\n'.format(ith_col + 1, ','.join(current_clf[:, ith_col].ravel()))
+
+
 if __name__ == '__main__':
-    structuriseresults('nongrams')
+    #  structuriseresults('nongrams')
     #  saveandjoin30iter('ngrams')
+    showresultstatistics()
