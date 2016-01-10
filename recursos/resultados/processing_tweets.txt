@@ -94,7 +94,7 @@ Raw text: dont want to go back to school on thursday, mainly because my bitch @B
 	stemming words: ['dont', 'want', 'go', 'back', 'school', 'thursday', 'mainli', 'my', 'bitch', 'wont', 'bulli', 'me']
 	remove unimportant sequences: ['dont', 'want', 'go', 'back', 'school', 'thursday', 'mainli', 'my', 'bitch', 'wont', 'bulli', 'me']
 
-Raw text: RT @igetlaughss: All these hoes are worried about having a nigga, falling in love and shit ... BITCH, graduate high school first.
+Raw text: RT @igetlaughss: All these hoes are worried about having a nigga, falling in love and shit ... BITCH, graduate high school first.	
 	replace pronouns/contractions:  All these hoes are worried about having a nigga, falling in love and shit ... BITCH, graduate high school first.
 	remove punctuals: ['All', 'these', 'hoes', 'are', 'worried', 'about', 'having', 'a', 'nigga', 'falling', 'in', 'love', 'and', 'shit', 'BITCH', 'graduate', 'high', 'school', 'first']
 	remove aposthrophe: ['All', 'these', 'hoes', 'are', 'worried', 'about', 'having', 'a', 'nigga', 'falling', 'in', 'love', 'and', 'shit', 'BITCH', 'graduate', 'high', 'school', 'first']
@@ -7438,8 +7438,8 @@ Raw text: Back to working twice a week because of fucking school. I hate short c
 	stemming words: ['Back', 'work', 'twice', 'week', 'fuck', 'school', 'I', 'hate', 'short', 'check', 'smh']
 	remove unimportant sequences: ['Back', 'work', 'twice', 'week', 'fuck', 'school', 'I', 'hate', 'short', 'check', 'smh']
 
-Raw text: Can't believe school charge £30, to bring in your own food and they say they need the money bcos we sit on the chairs, fucking pathetic
-	replace pronouns/contractions: Can't believe school charge £30, to bring in your own food and they say they need the money bcos we sit on the chairs, fucking pathetic
+Raw text: Can't believe school charge Â£30, to bring in your own food and they say they need the money bcos we sit on the chairs, fucking pathetic
+	replace pronouns/contractions: Can't believe school charge Â£30, to bring in your own food and they say they need the money bcos we sit on the chairs, fucking pathetic
 	remove punctuals: ['Can', 't', 'believe', 'school', 'charge', '\xa330', 'to', 'bring', 'in', 'your', 'own', 'food', 'and', 'they', 'say', 'they', 'need', 'the', 'money', 'bcos', 'we', 'sit', 'on', 'the', 'chairs', 'fucking', 'pathetic']
 	remove aposthrophe: ['Can', 't', 'believe', 'school', 'charge', '\xa330', 'to', 'bring', 'in', 'your', 'own', 'food', 'and', 'they', 'say', 'they', 'need', 'the', 'money', 'bcos', 'we', 'sit', 'on', 'the', 'chairs', 'fucking', 'pathetic']
 	remove stopwords: ('believe', 'school', 'charge', '\xa330', 'bring', 'your', 'food', 'they', 'say', 'they', 'need', 'money', 'bcos', 'we', 'sit', 'chairs', 'fucking', 'pathetic')
@@ -10212,8 +10212,8 @@ Raw text: So I'm not aloud to wear a tanktop, but this girls allowed to fucking 
 	stemming words: ['I', 'aloud', 'wear', 'tanktop', 'girl', 'allow', 'fuck', 'wear', 'carrot', 'costum', 'school']
 	remove unimportant sequences: ['I', 'aloud', 'wear', 'tanktop', 'girl', 'allow', 'fuck', 'wear', 'carrot', 'costum', 'school']
 
-Raw text: @derra0: I don't want school to start I don't wanna wear bras I don't wanna wear pants WHAT THE FUCK!!?¿
-	replace pronouns/contractions: I don't want school to start I don't wanna wear bras I don't wanna wear pants WHAT THE FUCK!!?¿
+Raw text: @derra0: I don't want school to start I don't wanna wear bras I don't wanna wear pants WHAT THE FUCK!!?Â¿
+	replace pronouns/contractions: I don't want school to start I don't wanna wear bras I don't wanna wear pants WHAT THE FUCK!!?Â¿
 	remove punctuals: ['I', 'don', 't', 'want', 'school', 'to', 'start', 'I', 'don', 't', 'wan', 'na', 'wear', 'bras', 'I', 'don', 't', 'wan', 'na', 'wear', 'pants', 'WHAT', 'THE', 'FUCK', '\xbf']
 	remove aposthrophe: ['I', 'don', 't', 'want', 'school', 'to', 'start', 'I', 'don', 't', 'wan', 'na', 'wear', 'bras', 'I', 'don', 't', 'wan', 'na', 'wear', 'pants', 'WHAT', 'THE', 'FUCK', '\xbf']
 	remove stopwords: ('I', 'want', 'school', 'start', 'I', 'wan', 'na', 'wear', 'bras', 'I', 'wan', 'na', 'wear', 'pants', 'FUCK', '\xbf')

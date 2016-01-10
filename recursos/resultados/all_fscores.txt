@@ -1,0 +1,175 @@
+nongrams_binary_kfolds_Poly-2 Kernel
+
+	ngrams_binary_kfolds_AdaBoost
+	class 1 -- test statisic: 21.1336042364 	pvalue of the t-test: 6.26821493695e-29 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -72.3266144697 	pvalue of the t-test: 1.52025113228e-58 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_eensemble_AdaBoost
+	class 1 -- test statisic: 20.3417953564 	pvalue of the t-test: 4.43164204842e-28 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -8.78943496243 	pvalue of the t-test: 2.95618689697e-12 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_eensemble_GradientBoosting
+	class 1 -- test statisic: 33.4475834445 	pvalue of the t-test: 1.3140843701e-39 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -7.72000860812 	pvalue of the t-test: 1.80678256086e-10 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_hparamt_Poly-2 Kernel
+	class 1 -- test statisic: 151.374604974 	pvalue of the t-test: 4.8237258932e-77 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 385.079062804 	pvalue of the t-test: 1.55248824727e-100 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_kfolds_GradientBoosting
+	class 1 -- test statisic: 1.65867088254 	pvalue of the t-test: 0.102581061794 	degrees of freedom used in the t-test: 58.0 P-value mayor a 0.05
+	class 2 -- test statisic: -68.5572512131 	pvalue of the t-test: 3.27171396979e-57 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_ros_Poly-2 Kernel
+	class 1 -- test statisic: 7.49242176379 	pvalue of the t-test: 4.35878613399e-10 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -10.0075391773 	pvalue of the t-test: 3.01857635112e-14 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_eensemble_AdaBoost
+	class 1 -- test statisic: 27.2861915605 	pvalue of the t-test: 8.79059379877e-35 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -7.2496860724 	pvalue of the t-test: 1.11550439015e-09 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_ros_AdaBoost
+	class 1 -- test statisic: 11.898809641 	pvalue of the t-test: 3.35664832865e-17 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -22.8878832854 	pvalue of the t-test: 1.00031610167e-30 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_kfolds_GradientBoosting
+	class 1 -- test statisic: 14.2280324797 	pvalue of the t-test: 1.42905354247e-20 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -30.7167419691 	pvalue of the t-test: 1.41634624643e-37 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_ros_GradientBoosting
+	class 1 -- test statisic: 12.4394042377 	pvalue of the t-test: 5.20790625005e-18 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -21.8825859659 	pvalue of the t-test: 1.03762787115e-29 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_ros_Poly-2 Kernel
+	class 1 -- test statisic: 1.69960354525 	pvalue of the t-test: 0.0945632946439 	degrees of freedom used in the t-test: 58.0 P-value mayor a 0.05
+	class 2 -- test statisic: -12.9710858447 	pvalue of the t-test: 8.64180116555e-19 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_eensemble_Poly-2 Kernel
+	class 1 -- test statisic: 16.4761199766 	pvalue of the t-test: 1.52021766182e-23 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -8.63448767051 	pvalue of the t-test: 5.34358972846e-12 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_ros_GradientBoosting
+	class 1 -- test statisic: 9.19870299092 	pvalue of the t-test: 6.24310289889e-13 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -21.9869992075 	pvalue of the t-test: 8.1062953025e-30 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_eensemble_Poly-2 Kernel
+	class 1 -- test statisic: 16.5144191364 	pvalue of the t-test: 1.35996320046e-23 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -8.58500949818 	pvalue of the t-test: 6.45772644335e-12 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_kfolds_Poly-2 Kernel
+	class 1 -- test statisic: 13.0000978762 	pvalue of the t-test: 7.84319281253e-19 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 38.9701812615 	pvalue of the t-test: 2.69839288655e-43 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_kfolds_AdaBoost
+	class 1 -- test statisic: 5.76567847876 	pvalue of the t-test: 3.3065542353e-07 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -5.39638227114 	pvalue of the t-test: 1.31449388105e-06 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_binary_eensemble_GradientBoosting
+	class 1 -- test statisic: 25.7515007115 	pvalue of the t-test: 1.96235705164e-33 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -9.81829639159 	pvalue of the t-test: 6.09694096641e-14 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_ros_AdaBoost
+	class 1 -- test statisic: 7.92828689754 	pvalue of the t-test: 8.07824620193e-11 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: -23.6400359746 	pvalue of the t-test: 1.83326792357e-31 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_binary_hparamt_Poly-2 Kernel
+	class 1 -- test statisic: 141.842972581 	pvalue of the t-test: 2.07616234919e-75 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 385.079062804 	pvalue of the t-test: 1.55248824727e-100 	degrees of freedom used in the t-test: 58.0
+
+
+nongrams_multi_kfolds_Poly-2 Kernel
+
+	ngrams_multi_eensemble_Poly-2 Kernel
+	class 1 -- test statisic: 32.6219592607 	pvalue of the t-test: 5.21129362239e-39 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 13.0713423731 	pvalue of the t-test: 6.18414693271e-19 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -8.96483353211 	pvalue of the t-test: 1.5156727503e-12 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_eensemble_GradientBoosting
+	class 1 -- test statisic: 34.0089893666 	pvalue of the t-test: 5.24017644098e-40 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 30.512366211 	pvalue of the t-test: 2.04028007272e-37 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -8.0331266067 	pvalue of the t-test: 5.38979707506e-11 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_kfolds_Poly-2 Kernel
+	class 1 -- test statisic: 41.0311112834 	pvalue of the t-test: 1.50561637109e-44 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 19.8059731279 	pvalue of the t-test: 1.72085544575e-27 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -16.9796296251 	pvalue of the t-test: 3.56219446487e-24 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_kfolds_GradientBoosting
+	class 1 -- test statisic: 2.28419735166 	pvalue of the t-test: 0.0260380197961 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 5.91761053201 	pvalue of the t-test: 1.86279759945e-07 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -57.9915203233 	pvalue of the t-test: 4.68656573409e-53 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_eensemble_AdaBoost
+	class 1 -- test statisic: 33.1375562718 	pvalue of the t-test: 2.19644536189e-39 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 22.3468137357 	pvalue of the t-test: 3.48656179827e-30 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -7.29095538274 	pvalue of the t-test: 9.50800225487e-10 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_kfolds_AdaBoost
+	class 1 -- test statisic: 19.5511877185 	pvalue of the t-test: 3.3120665591e-27 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 7.18979161997 	pvalue of the t-test: 1.40654796854e-09 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -94.627370228 	pvalue of the t-test: 2.94328824993e-65 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_ros_GradientBoosting
+	class 1 -- test statisic: 0.0153492244255 	pvalue of the t-test: 0.987806250066 	degrees of freedom used in the t-test: 58.0 P-value mayor a 0.05
+	class 2 -- test statisic: 11.0164465915 	pvalue of the t-test: 7.60335204755e-16 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -22.699621319 	pvalue of the t-test: 1.54041604399e-30 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_hparamt_Poly-2 Kernel
+	class 1 -- test statisic: 347.751109666 	pvalue of the t-test: 5.73130056395e-98 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 114.272191312 	pvalue of the t-test: 5.5249328884e-70 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: 336.65817285 	pvalue of the t-test: 3.75369099186e-97 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_eensemble_AdaBoost
+	class 1 -- test statisic: 28.6925679486 	pvalue of the t-test: 5.80729504214e-36 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 23.3505144898 	pvalue of the t-test: 3.50429121896e-31 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -8.09766358033 	pvalue of the t-test: 4.20222156533e-11 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_ros_GradientBoosting
+	class 1 -- test statisic: 5.19409151804 	pvalue of the t-test: 2.77034451103e-06 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 6.94012717858 	pvalue of the t-test: 3.69451070025e-09 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -23.4323520588 	pvalue of the t-test: 2.91594484389e-31 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_ros_Poly-2 Kernel
+	class 1 -- test statisic: 347.751109666 	pvalue of the t-test: 5.73130056395e-98 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 6.93167448203 	pvalue of the t-test: 3.81719617857e-09 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -13.3876576859 	pvalue of the t-test: 2.16993777426e-19 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_eensemble_GradientBoosting
+	class 1 -- test statisic: 25.3835291019 	pvalue of the t-test: 4.22915589507e-33 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 27.6924620059 	pvalue of the t-test: 3.9612737433e-35 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -8.74108911174 	pvalue of the t-test: 3.55527724749e-12 	degrees of freedom used in the t-test: 58.0
+
+	ngrams_multi_ros_AdaBoost
+	class 1 -- test statisic: 3.70028657543 	pvalue of the t-test: 0.000480784190268 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 4.88546359029 	pvalue of the t-test: 8.49201703939e-06 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -17.7922693459 	pvalue of the t-test: 3.63662135249e-25 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_eensemble_Poly-2 Kernel
+	class 1 -- test statisic: 30.6611354817 	pvalue of the t-test: 1.56389244636e-37 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 17.7733219552 	pvalue of the t-test: 3.83218183055e-25 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -8.33737462698 	pvalue of the t-test: 1.6699363585e-11 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_ros_AdaBoost
+	class 1 -- test statisic: -0.524230054184 	pvalue of the t-test: 0.602116302434 	degrees of freedom used in the t-test: 58.0 P-value mayor a 0.05
+	class 2 -- test statisic: 12.4837795759 	pvalue of the t-test: 4.47667040553e-18 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -24.8221593924 	pvalue of the t-test: 1.38955992041e-32 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_hparamt_Poly-2 Kernel
+	class 1 -- test statisic: 347.751109666 	pvalue of the t-test: 5.73130056395e-98 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 110.071764889 	pvalue of the t-test: 4.80193734225e-69 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: 336.65817285 	pvalue of the t-test: 3.75369099186e-97 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_kfolds_GradientBoosting
+	class 1 -- test statisic: -24.0910234391 	pvalue of the t-test: 6.76832537108e-32 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 4.82240784278 	pvalue of the t-test: 1.06452784853e-05 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -53.9835978197 	pvalue of the t-test: 2.77023313073e-51 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_ros_Poly-2 Kernel
+	class 1 -- test statisic: 347.751109666 	pvalue of the t-test: 5.73130056395e-98 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 10.10833351 	pvalue of the t-test: 2.07899889247e-14 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -7.461598821 	pvalue of the t-test: 4.91116455658e-10 	degrees of freedom used in the t-test: 58.0
+
+	nongrams_multi_kfolds_AdaBoost
+	class 1 -- test statisic: -3.02539743877 	pvalue of the t-test: 0.00369741247236 	degrees of freedom used in the t-test: 58.0
+	class 2 -- test statisic: 12.110936588 	pvalue of the t-test: 1.60855638049e-17 	degrees of freedom used in the t-test: 58.0
+	class 3 -- test statisic: -9.12509041319 	pvalue of the t-test: 8.24965931412e-13 	degrees of freedom used in the t-test: 58.0
