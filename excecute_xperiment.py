@@ -10,7 +10,7 @@ from nltk import word_tokenize, pos_tag, bigrams, PorterStemmer, LancasterStemme
 from nltk.corpus import stopwords
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
-from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import precision_recall_fscore_support, roc_auc_score, confusion_matrix
 from sklearn import svm, cross_validation
 import numpy as np
 import json
@@ -232,6 +232,14 @@ class ValorNuloError(Exception):
         return 'El valor hace una referencia nula o vacia'
 
 
+class InvalidOption(Exception):
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return 'Invalid argument'
+
+
 def readexceldata(path_file):
     book = XLSXBook(path_file)
     content = book.sheets()
@@ -277,7 +285,7 @@ def preprocessdataset():
     anlys.featuresextr('ngrams.csv')
 
 
-def learningtoclassify(t_dataset, i_iter='', data_set=[]):
+def learningtoclassify(t_dataset, i_iter='', data_set=[], specific_clf=[]):
     features_space = data_set
 
     np.random.shuffle(features_space)
@@ -294,13 +302,13 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[]):
                    n_estimators=100, algorithm='SAMME'),
                    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
                                                                   max_depth=1, random_state=0)}
-    type_classifier = {'multi': None, 'binary': None}
-
+    #  type_classifier = {'multi': None, 'binary': None}
+    type_classifier = {selected_clf.split('_')[1]: None for selected_clf in specific_clf}
     x = features_space[:, :4]
 
     kf_total = cross_validation.KFold(len(x), n_folds=10)
     for type_clf in type_classifier.keys():
-        general_metrics = {'Poly-2 Kernel': [[], []], 'AdaBoost': [[], []], 'GradientBoosting': [[], []]}
+        general_metrics = {'Poly-2 Kernel': [[], [], []], 'AdaBoost': [[], [], []], 'GradientBoosting': [[], [], []]}
         if type_clf == 'binary':
             y = np.array(binarizearray(features_space[:, 4:5].ravel()))
         else:
@@ -315,27 +323,36 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[]):
                 ind_score = inst_clf.score(x[test_ind], y[test_ind])
                 general_metrics[clf_name][0].append(ind_score)
                 general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
+                if type_clf == 'binary':
+                    last_metric = round(roc_auc_score(y_true, y_pred), 4)
+                else:
+                    last_metric = '-'.join([str(elem) for elem in confusion_matrix(y_true, y_pred).ravel()])
+                general_metrics[clf_name][2].append(last_metric)
 
         for clf_name in classifiers.keys():
             results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
-                                      np.array(general_metrics[clf_name][1])), axis=1)
+                                      np.array(general_metrics[clf_name][1]),
+                                      np.expand_dims(np.array(general_metrics[clf_name][2]), axis=1)), axis=1)
             guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
                         format(t_dataset, type_clf, clf_name, i_iter))
 
 
-def machinelearning(type_set):
+def machinelearning(type_set, cmd_line=''):
     data = contenido_csv('recursos/{}.csv'.format(type_set))
     print '\n---------------------------------------->>>>   10-FOLDS   <<<<--------------------------------------------'
     print '\n------------------------------------>>>>   NO NORMALISATION   <<<<----------------------------------------'
+    selected_clfs = ('nongrams_multi_kfolds_Poly-2 Kernel', 'nongrams_binary_kfolds_Poly-2 Kernel')
     for cicle in range(30):
-        learningtoclassify(type_set, cicle + 1, np.array(data, dtype='f'))
+        learningtoclassify(type_set, cicle + 1, np.array(data, dtype='f'), specific_clf=selected_clfs)
 
 
 if __name__ == '__main__':
     #  preprocessdataset()
-    t_data = 'ngrams'
-    machinelearning(t_data)
-    '''gridsearch.machinelearning(t_data)
-    undersampling.machinelearning(t_data)
-    oversampling.machinelearning(t_data)
-    '''
+    t_data, cmd_line = 'nongrams', 'metrics Poly-2 Kernel-AdaBoost-GradientBoosting'
+
+    for t_data in ('ngrams', 'nongrams'):
+        '''machinelearning(t_data, )
+        gridsearch.machinelearning(t_data)
+        undersampling.machinelearning(t_data)
+        '''
+        oversampling.machinelearning(t_data)
