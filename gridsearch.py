@@ -30,7 +30,8 @@ def searchinghparameters(features_space):
 
         tuned_parameters = [{'kernel': ['poly'], 'degree': [2, 3], 'C': [1, 10, 100, 1000], 'gamma': [1e-3, 1e-4],
                              'cache_size': [300, 500]}]
-        scores = ['precision', 'recall']
+        #  scores = ['precision', 'recall']
+        scores = ['f1', ]
         for score in scores:
             print '# Tuning hyper-parameters for %s\n' % score
             clf = GridSearchCV(svm.SVC(C=1), tuned_parameters, cv=10, scoring='%s_weighted' % score)
@@ -85,12 +86,13 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
                     ind_score = inst_clf.score(x[test_ind], y[test_ind])
                     general_metrics[clf_name][0].append(ind_score)
                     general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
-
+            '''
             for clf_name in classifiers.keys():
                 results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                           np.array(general_metrics[clf_name][1])), axis=1)
                 guardar_csv(results, 'recursos/resultados/{}_{}_hparamt_{}_{}.csv'.
-                            format(type_dataset, type_clf, clf_name, i_iter+1))
+                            format(type_dataset, type_clf, clf_name, i_iter + 1))
+                            '''
 
 
 def machinelearning(type_set):
@@ -98,4 +100,4 @@ def machinelearning(type_set):
           '<<<<-------------------------------------------'
     data = contenido_csv('recursos/{}.csv'.format(type_set))
     features_space = np.array(data, dtype='f')
-    learningtoclassify(type_set, 30, features_space)
+    learningtoclassify(type_set, 1, features_space)

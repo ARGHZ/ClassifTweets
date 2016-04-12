@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from math import log
-from time import time
+import cProfile, pstats, StringIO
 import random
 import re
 
@@ -10,19 +10,18 @@ from nltk import word_tokenize, pos_tag, bigrams, PorterStemmer, LancasterStemme
 from nltk.corpus import stopwords
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
-from sklearn.metrics import precision_recall_fscore_support, roc_auc_score, confusion_matrix
+from sklearn.metrics import precision_recall_fscore_support, confusion_matrix
 from sklearn import svm, cross_validation
 import numpy as np
 import json
 import matplotlib.pyplot as plt
 
-import gridsearch
-import eensemble as undersampling
-import ros as oversampling
 
 from utiles import leerarchivo, guardararchivo, guardar_csv, contenido_csv, binarizearray
 
 __author__ = 'Juan David Carrillo López'
+
+pr = cProfile.Profile()
 
 
 class TextAnalysis:
@@ -100,6 +99,7 @@ class TextAnalysis:
     def posbigrams(list_words):
         pair_tags = (('PRP', 'VBP'), ('JJ', 'DT'), ('VB', 'PRP'))
         pair_words = tuple(bigrams(list_words))
+        res = pos_tag(list_words)
         ptag_counter = [0, 0, 0]
         for word_tokens in pair_words:
             tagged_pair = np.array(pos_tag(word_tokens))
@@ -187,6 +187,7 @@ class TextAnalysis:
             text = self.replacepronounscontractiosn(' '.join(text))
             process_tweets.append('\treplace pronouns/contractions: {}'.format(text))
             word_list = word_tokenize(self.removepunctuals(text))
+            #  print '{} \n\t{}'.format(' '.join(word_list), pos_tag(word_list))
             process_tweets.append('\tremove punctuals: {}'.format(word_list))
             word_list = [self.stemaposphe(w) for w in word_list]
             process_tweets.append('\tremove aposthrophe: {}'.format(word_list))
@@ -218,9 +219,10 @@ class TextAnalysis:
             feat_bigrams = self.posbigrams(tweet_tokens)
             ortony_occur = self.wordsoccurrences(tweet_tokens)
             profane_occur = self.wordsoccurrences(tweet_tokens, option='profane')
-            #  print (tfidf_vector, ortony_occur, profane_occur, feat_bigrams, weight)
+            preprocessed_twits = self.new_tweetset[:, 0]
+            guardar_csv(preprocessed_twits, 'recursos/processed_twits.csv')
             new_set.append((sum(tfidf_vector), ortony_occur, profane_occur, sum(feat_bigrams), weight))
-        #  guardar_csv(new_set, 'recursos/{}'.format(set_name))
+        guardar_csv(new_set, 'recursos/{}'.format(set_name))
         self.features_space = np.array(new_set)
 
 
@@ -308,7 +310,11 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[], specific_clf=[]):
 
     kf_total = cross_validation.KFold(len(x), n_folds=10)
     for type_clf in type_classifier.keys():
-        general_metrics = {'Poly-2 Kernel': [[], [], []], 'AdaBoost': [[], [], []], 'GradientBoosting': [[], [], []]}
+        if len(specific_clf) <= 0:
+            general_metrics = {'Poly-2 Kernel': [[], [], []], 'AdaBoost': [[], [], []],
+                               'GradientBoosting': [[], [], []]}
+        else:
+            general_metrics = {selected_clf.split('_')[3]: [[], [], []] for selected_clf in specific_clf}
         if type_clf == 'binary':
             y = np.array(binarizearray(features_space[:, 4:5].ravel()))
         else:
@@ -317,23 +323,44 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[], specific_clf=[]):
         for train_ind, test_ind in kf_total:
             scaled_test_set = x[test_ind]
             for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
-                inst_clf = clf.fit(x[train_ind], y[train_ind])
-                y_pred = clf.predict(scaled_test_set)
-                y_true = y[test_ind]
-                ind_score = inst_clf.score(x[test_ind], y[test_ind])
-                general_metrics[clf_name][0].append(ind_score)
-                general_metrics[clf_name][1].append(np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
-                if type_clf == 'binary':
-                    last_metric = round(roc_auc_score(y_true, y_pred), 4)
-                else:
+                actual_clf = '{}_{}_kfolds_{}'.format(t_dataset, type_clf, clf_name)
+                try:
+                    ith_idx = specific_clf.index(actual_clf)
+                    pr.enable()
+                    inst_clf = clf.fit(x[train_ind], y[train_ind])
+                    pr.disable()
+                    s = StringIO.StringIO()
+                    sortby = 'cumulative'
+                    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+                    ps.print_stats()
+                    print s.getvalue()
+                    y_pred = clf.predict(scaled_test_set)
+                    y_true = y[test_ind]
+                    ind_score = inst_clf.score(x[test_ind], y[test_ind])
+                    general_metrics[clf_name][0].append(ind_score)
+                    general_metrics[clf_name][1].append(
+                            np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
                     last_metric = '-'.join([str(elem) for elem in confusion_matrix(y_true, y_pred).ravel()])
-                general_metrics[clf_name][2].append(last_metric)
-
+                    general_metrics[clf_name][2].append(last_metric)
+                except ValueError:
+                    pass
+        '''
         for clf_name in classifiers.keys():
             results = np.concatenate((np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1),
                                       np.array(general_metrics[clf_name][1]),
                                       np.expand_dims(np.array(general_metrics[clf_name][2]), axis=1)), axis=1)
             guardar_csv(results, 'recursos/resultados/{}_{}_kfolds_{}_{}.csv'.
+                        format(t_dataset, type_clf, clf_name, i_iter))
+                        '''
+        for clf_name in general_metrics.keys():
+            array_a = np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1)
+            array_b = np.array(general_metrics[clf_name][1])
+            array_c = np.expand_dims(np.array(general_metrics[clf_name][2]), axis=1)
+            try:
+                results = np.concatenate((array_a, array_b, array_c), axis=1)
+            except ValueError as e:
+                print '{}: {}'.format(clf_name, str(e))
+            guardar_csv(results, 'recursos/resultados/elite_{}_{}_kfolds_{}_{}.csv'.
                         format(t_dataset, type_clf, clf_name, i_iter))
 
 
@@ -347,12 +374,14 @@ def machinelearning(type_set, cmd_line=''):
 
 
 if __name__ == '__main__':
-    #  preprocessdataset()
+    preprocessdataset()
     t_data, cmd_line = 'nongrams', 'metrics Poly-2 Kernel-AdaBoost-GradientBoosting'
 
-    for t_data in ('ngrams', 'nongrams'):
-        '''machinelearning(t_data, )
+    '''for t_data in ('nongrams', 'ngrams'):
+        print '\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   {}   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.\
+            format(t_data)
+        machinelearning(t_data, )
         gridsearch.machinelearning(t_data)
         undersampling.machinelearning(t_data)
-        '''
         oversampling.machinelearning(t_data)
+        '''
