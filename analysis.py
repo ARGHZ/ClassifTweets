@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from utiles import contenido_csv, guardararchivo
+from utiles import contenido_csv, leerarchivo, guardararchivo, guardar_csv
 
 __author__ = 'Juan David Carrillo López'
 
@@ -218,7 +218,11 @@ def showstatsresults():
             plt.subplot()
             for clf_name in filtered_data.keys():
                 data_toplot.append(filtered_data[clf_name][selct_metric])
-                data_labels.append(clf_name[2:])
+                if clf_name[2:][0] == 'O':
+                    clf_name = 'N{}'.format(clf_name[3:])
+                else:
+                    clf_name = 'L{}'.format(clf_name[3:])
+                data_labels.append(clf_name)
             plt.boxplot(data_toplot)
 
             if 'Accuracy' in selct_metric:
@@ -226,7 +230,7 @@ def showstatsresults():
             else:
                 selct_metric = 'F-score_Clase_{}'.format(selct_metric[-1])
             plt.xticks(np.arange(0, len(data_toplot)) + 1, data_labels)
-            plt.savefig('recursos/charts/{}_{}_{}.jpg'.format(clf_case, selct_metric, clf_case))
+            plt.savefig('recursos/charts/{}_{}_{}.eps'.format(clf_case, selct_metric, clf_case))
             plt.close()
 
 
@@ -360,6 +364,21 @@ if __name__ == '__main__':
     '''random_labels = np.asarray(np.random.random_integers(0, 10, 10000), dtype=np.str_)
     random_labels = (','.join(random_labels), )
     guardararchivo(random_labels, 'recursos/rand_labelling.txt')
+
+    data_features = np.array(contenido_csv('recursos/nongrams.csv'))
+
+    random_labels = []
+    for rand_val in leerarchivo('recursos/rand_labelling.txt')[0].split(',')[:data_features.shape[0]]:
+        rand_val = int(rand_val)
+        if rand_val < 4:
+            random_labels.append(1)
+        elif rand_val > 6:
+            random_labels.append(3)
+        else:
+            random_labels.append(2)
+    random_labels = np.array(random_labels).reshape((len(random_labels), 1))
+    new_data = np.concatenate((data_features, random_labels), axis=1)
+    guardar_csv(data_features, 'recursos/rand_ngrams.csv')
     '''
     #  structuriseresults('nongrams')
     #  saveandjoin30iter('nongrams')

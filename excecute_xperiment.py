@@ -304,8 +304,11 @@ def learningtoclassify(t_dataset, i_iter='', data_set=[], specific_clf=[]):
                    n_estimators=100, algorithm='SAMME'),
                    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
                                                                   max_depth=1, random_state=0)}
-    #  type_classifier = {'multi': None, 'binary': None}
-    type_classifier = {selected_clf.split('_')[1]: None for selected_clf in specific_clf}
+
+    if len(specific_clf) >= 1:
+        type_classifier = {selected_clf.split('_')[1]: None for selected_clf in specific_clf}
+    else:
+        type_classifier = {'multi': None, 'binary': None}
     x = features_space[:, :4]
 
     kf_total = cross_validation.KFold(len(x), n_folds=10)
@@ -377,10 +380,10 @@ if __name__ == '__main__':
     preprocessdataset()
     t_data, cmd_line = 'nongrams', 'metrics Poly-2 Kernel-AdaBoost-GradientBoosting'
 
-    '''for t_data in ('nongrams', 'ngrams'):
+    for t_data in ('nongrams', 'ngrams'):
         print '\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   {}   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.\
             format(t_data)
-        machinelearning(t_data, )
+        '''machinelearning(t_data, )
         gridsearch.machinelearning(t_data)
         undersampling.machinelearning(t_data)
         oversampling.machinelearning(t_data)
