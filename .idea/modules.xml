@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ClassifTweets.iml" filepath="$PROJECT_DIR$/.idea/ClassifTweets.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../CyberBullying/.idea/CyberBullying.iml" filepath="$PROJECT_DIR$/../CyberBullying/.idea/CyberBullying.iml" />
+      <module fileurl="file://$USER_HOME$/Dropbox/UANL/PSA/python27/.idea/python27.iml" filepath="$USER_HOME$/Dropbox/UANL/PSA/python27/.idea/python27.iml" />
     </modules>
   </component>
 </project>
-
