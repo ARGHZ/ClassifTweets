@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 import random
 import json
+import cProfile, pstats, StringIO
 
-from pyexcel_xlsx import XLSXBook
 from sklearn.preprocessing import MinMaxScaler
 from scipy.stats import itemfreq
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
 from unbalanced_dataset.over_sampling import OverSampler
 import numpy as np
-import matplotlib.pyplot as plt
 
 from utiles import contenido_csv, binarizearray, guardar_csv
 
 __author__ = 'Juan David Carrillo López'
+
+pr = cProfile.Profile()
 
 
 def votingoutputs(temp_array):
@@ -40,14 +41,21 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[], specific_clf=[]):
                        base_estimator=DecisionTreeClassifier(max_depth=1, min_samples_leaf=1), learning_rate=0.5,
                        n_estimators=100, algorithm='SAMME'),
                    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, learning_rate=0.5,
-                                                                        max_depth=1, random_state=0)}
-    type_classifier = {selected_clf.split('_')[1]: None for selected_clf in specific_clf}
+                                                                  max_depth=1, random_state=0)}
+    if len(specific_clf) >= 1:
+        type_classifier = {selected_clf.split('_')[1]: None for selected_clf in specific_clf}
+    else:
+        type_classifier = {'multi': None, 'binary': None}
+        for i in ('binary', 'multi'):
+            for j in classifiers.keys():
+                    specific_clf.append('{}_{}_ros_{}'.format(type_dataset, i, j))
+
     for type_clf in type_classifier.keys():
         if len(specific_clf) <= 0:
-            general_metrics = {'Poly-2 Kernel': [[], [], []], 'AdaBoost': [[], [], []],
-                               'GradientBoosting': [[], [], []]}
+            general_metrics = {'Poly-2 Kernel': [[], [], [], []], 'AdaBoost': [[], [], [], []],
+                               'GradientBoosting': [[], [], [], []]}
         else:
-            general_metrics = {selected_clf.split('_')[3]: [[], [], []] for selected_clf in specific_clf}
+            general_metrics = {selected_clf.split('_')[3]: [[], [], [], []] for selected_clf in specific_clf}
 
         for i_iter in range(n_iter):
             np.random.shuffle(features_space)
@@ -55,50 +63,78 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[], specific_clf=[]):
             print '\n\titeration: {}'.format(i_iter + 1)
             training_set = features_space[:int(number_rows * .8)]
             test_set = features_space[int(number_rows * .8) + 1:]
-            x = min_max_scaler.fit_transform(training_set[:, :4])
-            scaled_test_set = min_max_scaler.fit_transform(test_set[:, :4])
+            x = min_max_scaler.fit_transform(training_set[:, :features_space.shape[1] - 1])
+            scaled_test_set = min_max_scaler.fit_transform(test_set[:, :features_space.shape[1] - 1])
 
             ovsampling = OverSampler(verbose=True)
             if type_clf == 'binary':
-                y = np.array(binarizearray(training_set[:, 4:5].ravel()))
-                y_true = np.array(binarizearray(test_set[:, 4:5].ravel()))
+                y = np.array(binarizearray(training_set[:, features_space.shape[1] - 1:].ravel()))
+                y_true = np.array(binarizearray(test_set[:, features_space.shape[1] - 1:].ravel()))
             else:
-                y = training_set[:, 4:5].ravel()
-                y_true = test_set[:, 4:5].ravel()
+                y = training_set[:, features_space.shape[1] - 1:].ravel()
+                y_true = test_set[:, features_space.shape[1] - 1:].ravel()
             rox, roy = ovsampling.fit_transform(x, y)
 
             for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
                 actual_clf = '{}_{}_ros_{}'.format(type_dataset, type_clf, clf_name)
                 try:
-                    ith_idx = specific_clf.index(actual_clf)
+                    specific_clf.index(actual_clf)
                 except ValueError:
                     pass
                 else:
+                    pr.enable()
                     clf.fit(rox, roy)
+                    pr.disable()
+                    s = StringIO.StringIO()
+                    sortby = 'cumulative'
+                    ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+                    tt = round(ps.total_tt, 6)
+                    #  print '------------------------------------>>>>   {} \n{}\n'.format(clf_name)
                     y_pred = clf.predict(scaled_test_set)
+                    if type_clf == 'multi':
+                        y_true = np.random.random_integers(1, 3, len(y_true))
+                    else:
+                        y_true = np.random.random_integers(0, 1, len(y_true))
                     general_metrics[clf_name][0].append(accuracy_score(y_true, y_pred))
                     general_metrics[clf_name][1].append(
                         np.array(precision_recall_fscore_support(y_true, y_pred)).ravel())
-                    last_metric = confusion_matrix(y_true, y_pred).ravel()
-                    general_metrics[clf_name][2].append(last_metric)
+                    last_metric = '-'.join([str(elem) for elem in confusion_matrix(y_true, y_pred).ravel()])
+                    general_metrics[clf_name][2].append(tt)
+                    general_metrics[clf_name][3].append(last_metric)
+        # End of the ith iterations
+
         for clf_name in general_metrics.keys():
             array_a = np.expand_dims(np.array(general_metrics[clf_name][0]), axis=1)
             array_b = np.array(general_metrics[clf_name][1])
-            array_c = np.array(general_metrics[clf_name][2])
+            array_c = np.expand_dims(np.array(general_metrics[clf_name][2]), axis=1)
+            array_d = np.expand_dims(np.array(general_metrics[clf_name][3]), axis=1)
             try:
-                results = np.concatenate((array_a, array_b, array_c), axis=1)
+                results = np.concatenate((array_a, array_b, array_c, array_d), axis=1)
             except ValueError as e:
-                print '{}: {}'.format(clf_name, str(e))
+                print 'ERROR whilst saving {}_{}_ros_{}_{} metrics: {}'.\
+                    format(type_dataset, type_clf, clf_name, i_iter, str(e))
+                pass
             else:
-                guardar_csv(results, 'recursos/resultados/elite_{}_{}_ros_{}.csv'.
+                guardar_csv(results, 'recursos/resultados/experiment_tfidf/{}_{}_ros_{}.csv'.
                             format(type_dataset, type_clf, clf_name))
+                print 'saved {}_{}_ros_{}_{} metrics'.format(type_dataset, type_clf, clf_name, i_iter)
+    specific_clf = []  # End of multi/binary cicle
 
 
 def machinelearning(type_set, cmd_line=''):
-    data = contenido_csv('recursos/{}.csv'.format(type_set))
+    if 'rand' in type_set:
+        data = np.array(contenido_csv('recursos/{}.csv'.format(type_set)), dtype='f')
+        data = np.delete(data, data.shape[1] - 2, 1)  # removing the examiner gradeing
+    else:
+        data = np.array(contenido_csv('recursos/{}.csv'.format(type_set)), dtype='f')
+        # replacing tfidf vectorial sum by each tfidf vector
+        data = np.delete(data, 0, 1)
+        tfidf_vects = np.array(contenido_csv('recursos/tfidf_vectors.csv'.format(type_set)), dtype='f')
+        data = np.concatenate((tfidf_vects, data), axis=1)
+
     print '\n--------------------------------------->>>>   RANDOM OVERSAMPLING   ' \
           '<<<<-------------------------------------------'
     selected_clfs = ['nongrams_binary_ros_AdaBoost', 'nongrams_binary_ros_GradientBoosting',
                      'ngrams_binary_ros_AdaBoost', 'ngrams_multi_ros_AdaBoost', 'nongrams_multi_ros_AdaBoost',
                      'nongrams_multi_ros_GradientBoosting']
-    learningtoclassify(type_set, 30, np.array(data, dtype='f'), specific_clf=selected_clfs)
+    learningtoclassify(type_set.replace('rand_', ''), 30, data)

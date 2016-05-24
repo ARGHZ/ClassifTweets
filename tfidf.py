@@ -17,7 +17,7 @@ n_samples = 1744
 # Loading own corpus
 print("Loading preprocessed corpus")
 t0 = time()
-corpus = contenido_csv('recursos/processed_twits.csv')
+corpus = contenido_csv('recursos/processed_twits_slang.csv')
 corpus = [' '.join(document) for document in corpus]
 print("\tdone in %0.3fs." % (time() - t0))
 

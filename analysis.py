@@ -2,13 +2,13 @@
 import random
 import os
 
-from pyexcel_xlsx import XLSXBook
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from statsmodels.stats.weightstats import ttest_ind
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from utiles import contenido_csv, leerarchivo, guardararchivo, guardar_csv
+from utiles import contenido_csv, leerarchivo, guardararchivo, guardar_csv, binarizearray
 
 __author__ = 'Juan David Carrillo López'
 
@@ -34,7 +34,7 @@ def saveandjoin30iter(type_dataset):
                 else:
                     try:
                         for ith_iter in range(1, 31):
-                            csvfile_path = 'recursos/resultados/elite_{}_{}_{}_{}_{}.csv'. \
+                            csvfile_path = 'recursos/resultados/experiment_tfidf/{}_{}_{}_{}_{}.csv'. \
                                 format(type_dataset, t_clf, t_imprv, clf_name, ith_iter)
 
                             results = contenido_csv(csvfile_path)
@@ -48,15 +48,17 @@ def saveandjoin30iter(type_dataset):
                             print 'Renderizing: {}'.format(csvfile_path)
                             new_arr.append(statistics)
                     except IOError:
-                        print '\nArchivo no encontrado: elite_{}_{}_{}_{}_{}.csv'.\
+                        print '\nArchivo no encontrado: {}_{}_{}_{}_{}.csv'.\
                             format(type_dataset, t_clf, t_imprv, clf_name, ith_iter)
                     else:
                         new_arr = np.array(new_arr)
-                        guardar_csv(new_arr, 'recursos/resultados/elite_{}_{}_{}_{}.csv'.
+                        guardar_csv(new_arr, 'recursos/resultados/experiment_tfidf/{}_{}_{}_{}.csv'.
                                     format(type_dataset, t_clf, t_imprv, clf_name))
+                        print 'recursos/resultados/experiment_tfidf/{}_{}_{}_{}'.\
+                            format(type_dataset, t_clf, t_imprv, clf_name)
 
 
-def getalldata():
+def getalldata(xperiment_name):
     datasets = {'ngrams': None, 'nongrams': None}
     for data_type in datasets.keys():
         data_experiment = {'binary': {'kfolds': {'Poly-2 Kernel': None, 'AdaBoost': None, 'GradientBoosting': None},
@@ -71,44 +73,46 @@ def getalldata():
         for t_clf in data_experiment.keys():
             if t_clf == 'binary':
                 col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'R-class 1', 'R-class 2',
+                             'F1-class 1', 'F1-class 2', 'support class 1', 'support class 2', 'time']
+            else:
+                col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'P-class 3', 'R-class 1',
+                             'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3',
+                             'support class 1', 'support class 2', 'support class 3', 'time']
+            for t_imprv in data_experiment[t_clf].keys():
+                for clf_name in data_experiment[t_clf][t_imprv].keys():
+                    csvfile_path = 'recursos/resultados/{}/{}_{}_{}_{}.csv'.\
+                        format(xperiment_name, data_type, t_clf, t_imprv, clf_name)
+                    #  print 'Getting: {}'.format(csvfile_path)
+                    results = np.array(contenido_csv(csvfile_path))
+                    results = np.array(results[:, :len(col_names)], dtype='f')
+                    try:
+                        data_experiment[t_clf][t_imprv][clf_name] = pd.DataFrame(results, columns=col_names)
+                    except ValueError as e:
+                        print 'ERROR whilst saving metrics on {}_{}_{}: {}'.format(t_clf, t_imprv, clf_name, e)
+        datasets[data_type] = data_experiment
+    return datasets
+
+
+def getelitedata(specific_combinations, results_path):
+    eliteclf_data = {}
+    for combination in specific_combinations:
+        csvfile_path = '{}/{}.csv'.format(results_path, combination)
+        try:
+            type_classifier = combination.split('_')[1]
+            if type_classifier == 'binary':
+                col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'R-class 1', 'R-class 2',
                              'F1-class 1', 'F1-class 2', 'support class 1', 'support class 2']
             else:
                 col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'P-class 3', 'R-class 1',
                              'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3',
                              'support class 1', 'support class 2', 'support class 3']
-            for t_imprv in data_experiment[t_clf].keys():
-                for clf_name in data_experiment[t_clf][t_imprv].keys():
-                    csvfile_path = 'recursos/resultados/experiment_a/{}/{}_{}_{}.csv'.\
-                        format(data_type, t_clf, t_imprv, clf_name)
-                    #  print 'Getting: {}'.format(csvfile_path)
-                    results = contenido_csv(csvfile_path)
-                    results = np.array(results, dtype='f')
-                    data_experiment[t_clf][t_imprv][clf_name] = pd.DataFrame(results, columns=col_names)
-        datasets[data_type] = data_experiment
-    return datasets
-
-
-def getelitedata(specific_combinations):
-    eliteclf_data = {}
-    for combination in specific_combinations:
-        csvfile_path = 'recursos/resultados/elite_{}.csv'.format(combination)
-        try:
-            type_classifier = combination.split('_')[1]
-            if type_classifier == 'binary':
-                col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'R-class 1', 'R-class 2',
-                             'F1-class 1', 'F1-class 2', 'support class 1', 'support class 2',
-                             'CM-1', 'CM-2', 'CM-3', 'CM-4']
-            else:
-                col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'P-class 3', 'R-class 1',
-                             'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3',
-                             'support class 1', 'support class 2', 'support class 3',
-                             'CM-1', 'CM-2', 'CM-3', 'CM-4', 'CM-5', 'CM-6', 'CM-7', 'CM-8', 'CM-9']
 
             results = contenido_csv(csvfile_path)
         except IOError:
             print '\nArchivo {} no encontrado'.format(csvfile_path)
         else:
-            results = np.array(results, dtype='f')
+            results = np.array(results)
+            results = np.array(results[:, :len(col_names)], dtype='f')
             eliteclf_data[combination] = pd.DataFrame(results, columns=col_names)
     return eliteclf_data
 
@@ -139,32 +143,35 @@ def structuriseresults(type_dataset):
     print 'fin'
 
 
-def showstatsresults():
-    elite_clfs = ('nongrams_multi_kfolds_Poly-2 Kernel', 'nongrams_binary_kfolds_Poly-2 Kernel',
+def showstatsresults(prefx='', charts_path='recursos/charts/'):
+    '''elite_clfs = ('nongrams_multi_kfolds_Poly-2 Kernel', 'nongrams_binary_kfolds_Poly-2 Kernel',
                   'nongrams_binary_ros_AdaBoost', 'nongrams_binary_ros_GradientBoosting',
                   'ngrams_binary_ros_AdaBoost', 'ngrams_multi_ros_AdaBoost',
                   'nongrams_multi_ros_AdaBoost', 'nongrams_multi_ros_GradientBoosting')
-    all_metrics = getelitedata(elite_clfs)
+                  '''
+    elite_clfs = ('nongrams_multi_kfolds_Poly-2 Kernel', 'nongrams_binary_kfolds_Poly-2 Kernel',
+                  'ngrams_binary_eensemble_Poly-2 Kernel', 'ngrams_binary_eensemble_GradientBoosting',
+                  'nongrams_binary_eensemble_Poly-2 Kernel', 'ngrams_multi_eensemble_Poly-2 Kernel',
+                  'ngrams_multi_eensemble_GradientBoosting', 'nongrams_multi_eensemble_GradientBoosting')
+    all_metrics = getelitedata(elite_clfs, 'recursos/resultados/experiment_tfidf')
     metrics_candidate = {}
     for clf_name in elite_clfs[2:]:
         if 'binary' in clf_name:
             col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'R-class 1', 'R-class 2',
-                         'F1-class 1', 'F1-class 2', 'CM-1', 'CM-2', 'CM-3', 'CM-4']
+                         'F1-class 1', 'F1-class 2']
         else:
             col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'P-class 3', 'R-class 1',
-                         'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3',
-                         'CM-1', 'CM-2', 'CM-3', 'CM-4', 'CM-5', 'CM-6', 'CM-7', 'CM-8', 'CM-9']
+                         'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3']
         metrics_candidate[clf_name] = all_metrics[clf_name][col_names]
 
     metrics_main = {}
     for clf_name in elite_clfs[:2]:
         if 'binary' in clf_name:
             col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'R-class 1', 'R-class 2',
-                         'F1-class 1', 'F1-class 2', 'CM-1', 'CM-2', 'CM-3', 'CM-4']
+                         'F1-class 1', 'F1-class 2']
         else:
             col_names = ['Accuracy', 'P-class 1', 'P-class 2', 'P-class 3', 'R-class 1',
-                         'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3',
-                         'CM-1', 'CM-2', 'CM-3', 'CM-4', 'CM-5', 'CM-6', 'CM-7', 'CM-8', 'CM-9']
+                         'R-class 2', 'R-class 3', 'F1-class 1', 'F1-class 2', 'F1-class 3']
         metrics_main[clf_name] = all_metrics[clf_name][col_names]
 
     for m_clf_name in metrics_main.keys():
@@ -172,20 +179,19 @@ def showstatsresults():
         if 'binary' in m_clf_name:
             selected_col = {'Accuracy': 0, 'F1-class 1': 5, 'F1-class 2': 6}
             base_metric, confusion_m = 'F1-class 2', ['CM-1', 'CM-2', 'CM-3', 'CM-4']
-            clf_case_label = 'binario'
         else:
             selected_col = {'Accuracy': 0, 'F1-class 1': 7, 'F1-class 2': 8, 'F1-class 3': 9}
             base_metric, confusion_m = 'F1-class 3', ['CM-1', 'CM-2', 'CM-3', 'CM-4', 'CM-5',
                                                       'CM-6', 'CM-7', 'CM-8', 'CM-9']
-            clf_case_label = 'Multi-clase'
         m_clf_nshort = makeshortname(m_clf_name)
         print '\n{}'.format(m_clf_name)
         elit_metrics = []
-        query = metrics_main[m_clf_name][base_metric] == metrics_main[m_clf_name][base_metric].max()
+        '''query = metrics_main[m_clf_name][base_metric] == metrics_main[m_clf_name][base_metric].max()
         query_result = metrics_main[m_clf_name][query][confusion_m].values
         best_confussion_m = [round(val, 1) for val in np.nditer(query_result)]
 
         elit_metrics.append((m_clf_nshort, list(metrics_main[m_clf_name].mean(0).values), best_confussion_m))
+        '''
         filtered_data = {'1_{}'.format(m_clf_nshort): metrics_main[m_clf_name][selected_col.keys()]}
 
         cont = 2
@@ -203,15 +209,16 @@ def showstatsresults():
                         msg_result += ' P-value mayor a 0.05'
                     print '\t{}'.format(msg_result)
 
-                query = metrics_candidate[c_clf_name][base_metric] == metrics_candidate[c_clf_name][base_metric].max()
+                '''query = metrics_candidate[c_clf_name][base_metric] == metrics_candidate[c_clf_name][base_metric].max()
                 query_result = metrics_candidate[c_clf_name][query][confusion_m].values
                 best_confussion_m = [round(val, 1) for val in np.nditer(query_result)]
-
+                '''
                 filtered_data['{}_{}'.format(cont, makeshortname(c_clf_name))] = metrics_candidate[c_clf_name]
-                elit_metrics.append((makeshortname(c_clf_name), list(metrics_candidate[c_clf_name].mean(0).values),
+                '''elit_metrics.append((makeshortname(c_clf_name), list(metrics_candidate[c_clf_name].mean(0).values),
                                      best_confussion_m))
+                                     '''
                 cont += 1
-        #  guardar_csv(elit_metrics, 'recursos/resultados/elite_{}_metrics.csv'.format(clf_case))
+        #  guardar_csv(elit_metrics, 'recursos/resultados/experiment_tfidf/elite_{}_metrics.csv'.format(clf_case))
 
         for selct_metric in selected_col.keys():
             data_labels, data_toplot = [], []
@@ -230,12 +237,12 @@ def showstatsresults():
             else:
                 selct_metric = 'F-score_Clase_{}'.format(selct_metric[-1])
             plt.xticks(np.arange(0, len(data_toplot)) + 1, data_labels)
-            plt.savefig('recursos/charts/{}_{}_{}.eps'.format(clf_case, selct_metric, clf_case))
+            [plt.savefig('{}/{}{}_{}_{}.{}'.format(charts_path, clf_case, selct_metric, clf_case, img_format))
+             for img_format in ('eps', 'jpg')]
             plt.close()
 
 
-
-def makettest():
+def makettest(xperiment_dir):
     datasets, methods, classes, classifiers = ('ngrams', 'nongrams'), ('kfolds', 'eensemble', 'ros', 'hparamt'), \
                                               ('binary', 'multi'), ('Poly-2 Kernel', 'AdaBoost', 'GradientBoosting')
     all_metrics = {}
@@ -245,13 +252,20 @@ def makettest():
                 for clf in classifiers:
                     try:
                         clasifier_name = '{}_{}_{}_{}'.format(type_data, class_type, method, clf)
-                        all_metrics[clasifier_name] = (contenido_csv('recursos/resultados/experiment_a/{}/{}_{}_{}.csv'.
-                                                                     format(type_data, class_type, method, clf)))
+                        # To Select only: accuracy, precision, recall, f-score, support classes and time
+                        if class_type == 'multi':
+                            limit_cols = 14
+                        else:
+                            limit_cols = 10
+                        metrics_vect = contenido_csv('{}/{}_{}_{}_{}.csv'.format(xperiment_dir, type_data, class_type,
+                                                                                 method, clf))
+                        metrics_vect = np.array(metrics_vect)[:, :limit_cols]
+                        all_metrics[clasifier_name] = metrics_vect
                     except IOError as e:
                         pass
                     else:
-                        print '{}/recursos/resultados/experiment_a/{}/{}_{}_{}'. \
-                            format(SITE_ROOT, type_data, class_type, method, clf)
+                        print '{}/{}/{}_{}_{}_{}'. \
+                            format(SITE_ROOT, xperiment_dir, type_data, class_type, method, clf)
     fscore_idx = {'binary': [5, 6], 'multi': [7, 8, 9]}
     for class_type in classes:
         base_clf_name = 'nongrams_{}_kfolds_Poly-2 Kernel'.format(class_type)
@@ -360,15 +374,81 @@ def datasetstats():
     plt.close()
 
 
+def metricsofrandomsample(type_set, n_samples=30):
+    for type_clf in ('binary', 'multi'):
+        data = np.array(contenido_csv('recursos/{}.csv'.format(type_set)), dtype='f')[:, 4]
+        np.random.shuffle(data)
+        number_rows = data.shape[0]
+        test_set = data[int(number_rows * .8) + 1:].ravel()
+
+        rand_labels = np.array(contenido_csv('recursos/rand_labelling.csv'), dtype='f')[0]
+        rand_labels = rand_labels[:test_set.shape[0] * n_samples]
+
+        rand_labellings = []
+        for rand_val in rand_labels:
+            rand_val = int(rand_val)
+            if rand_val < 4:
+                rand_labellings.append(1)
+            elif rand_val > 6:
+                rand_labellings.append(3)
+            else:
+                rand_labellings.append(2)
+
+        if type_clf == 'binary':
+            test_set = binarizearray(test_set)
+            rand_labellings = binarizearray(rand_labellings)
+        rand_labellings = np.split(np.array(rand_labellings), n_samples)
+
+        y_labels = {'true': test_set, }
+        metrics = {}
+        for i in range(n_samples):
+            y_labels['{}'.format(i + 1)] = []
+            metrics['{}'.format(i + 1)] = []
+        for ith_sample in range(n_samples):
+            y_labels[str(ith_sample + 1)] = rand_labellings[ith_sample]
+            general_metric = [accuracy_score(test_set, rand_labellings[ith_sample])]
+            specific_metric = np.array(
+                    precision_recall_fscore_support(test_set, rand_labellings[ith_sample])[:3]).ravel()
+            temp_arr = np.concatenate((general_metric, specific_metric))
+            metrics[str(ith_sample + 1)] = temp_arr
+        y_labels, metrics = pd.DataFrame(y_labels), pd.DataFrame(metrics)
+        y_labels.to_csv('recursos/resultados/{}_{}_y_labels_rand.csv'.format(type_set, type_clf))
+        metrics.T.to_csv('recursos/resultados/{}_{}_y_labels_rand_metrics.csv'.format(type_set, type_clf))
+
+
+def analyserandomlabellings():
+
+    for type_dataset in ('ngrams', 'nongrams'):
+        for type_clf in ('binary', 'multi'):
+            file_base_path = 'recursos/resultados/labels_analysis/{}_{}_y_labels_rand_metrics.csv'.\
+                format(type_dataset, type_clf)
+            all_metrics = pd.read_csv(file_base_path, index_col='iters')
+            print '\n{}\n{}\n{}'.format(file_base_path, all_metrics, all_metrics.mean(0))
+
+            for column in all_metrics:
+                plt.subplot()
+                data_toplot = all_metrics[column].values
+
+                plt.boxplot(data_toplot)
+                plt.xticks([1], [column.title()])
+                # plt.show()
+                [plt.savefig('recursos/charts/random_sampling/{}_{}_{}_random.{}'.
+                             format(type_dataset, type_clf, column, img_format))
+                 for img_format in ('eps', 'jpg')]
+                plt.close()
+
+    print ''
+
+
 if __name__ == '__main__':
-    '''random_labels = np.asarray(np.random.random_integers(0, 10, 10000), dtype=np.str_)
+    '''random_labels = np.asarray(np.random.random_integers(0, 10, 30000), dtype=np.str_)
     random_labels = (','.join(random_labels), )
-    guardararchivo(random_labels, 'recursos/rand_labelling.txt')
+    guardararchivo(random_labels, 'recursos/random_numbers.txt')
 
     data_features = np.array(contenido_csv('recursos/nongrams.csv'))
 
     random_labels = []
-    for rand_val in leerarchivo('recursos/rand_labelling.txt')[0].split(',')[:data_features.shape[0]]:
+    for rand_val in leerarchivo('recursos/random_numbers.txt')[0].split(',')[:data_features.shape[0]]:
         rand_val = int(rand_val)
         if rand_val < 4:
             random_labels.append(1)
@@ -378,10 +458,13 @@ if __name__ == '__main__':
             random_labels.append(2)
     random_labels = np.array(random_labels).reshape((len(random_labels), 1))
     new_data = np.concatenate((data_features, random_labels), axis=1)
-    guardar_csv(data_features, 'recursos/rand_ngrams.csv')
+    guardar_csv(new_data, 'recursos/rand_nongrams.csv')
     '''
-    #  structuriseresults('nongrams')
-    #  saveandjoin30iter('nongrams')
-    #  makettest()
-    showstatsresults()
-    #  datasetstats()
+    # getalldata('experiment_tfidf')
+    # structuriseresults('experiment_tfidf')
+    # saveandjoin30iter('nongrams')
+    # makettest('recursos/resultados/experiment_tfidf')
+    # showstatsresults(prefx='', charts_path='recursos/charts/tfidf_vector')
+    # datasetstats()
+    # metricsofrandomsample('nongrams')
+    analyserandomlabellings()
