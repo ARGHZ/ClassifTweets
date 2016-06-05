@@ -283,7 +283,7 @@ def getnewdataset():
 def preprocessdataset():
     first_filter = np.array(readexceldata('recursos/ponderacion/conjuntos.xlsx'))
     prof_word = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
-    ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/offensive_profane_lexicon.txt')])
+    ortony_words = tuple([str(word.rstrip('\n')) for word in leerarchivo('recursos/ortony_lexicon.txt')])
 
     anlys = TextAnalysis(first_filter, ortony_words, prof_word)
     anlys.hashtagsdirectedrtweets()
