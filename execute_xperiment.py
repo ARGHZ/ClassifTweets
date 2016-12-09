@@ -400,10 +400,10 @@ if __name__ == '__main__':
     # preprocessdataset()
     t_data, cmd_line = 'nongrams', 'metrics Poly-2 Kernel-AdaBoost-GradientBoosting'
 
-    for t_data in ('nongrams', ):
+    for t_data in ('rand_nongrams', 'rand_ngrams'):
         print '\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   {}   <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.\
             format(t_data)
         # machinelearning(t_data)
         # oversampling.machinelearning(t_data)
-        # gridsearch.machinelearning(t_data)
-        undersampling.machinelearning(t_data)
+        gridsearch.machinelearning(t_data)
+        # undersampling.machinelearning(t_data)
