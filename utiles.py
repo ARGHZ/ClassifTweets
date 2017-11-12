@@ -2,11 +2,19 @@
 import csv
 import socket
 import SocketServer
+import json
 
 import numpy as np
 from scipy.stats import itemfreq
 
 __author__ = 'Juan David Carrillo López'
+
+
+def getnewdataset():
+    with open('recursos/bullyingV3/tweet.json') as json_file:
+        for line in json_file:
+            json_data = (json.loads(line)['id'], str(json.loads(line)['text']))
+    return json_data
 
 
 def votingoutputs(temp_array):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import cProfile, pstats, StringIO
 
-from sklearn.preprocessing import MinMaxScaler, Binarizer
+from sklearn.preprocessing import MinMaxScaler
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
@@ -106,15 +106,7 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
 
 
 def machinelearning(type_set):
-    if 'rand' in type_set:
-        data = np.array(contenido_csv('recursos/{}.csv'.format(type_set)), dtype='f')
-        data = np.delete(data, data.shape[1] - 2, 1)  # removing the examiner gradeing
-    else:
-        data = np.array(contenido_csv('recursos/{}.csv'.format(type_set)), dtype='f')
-        # replacing tfidf vectorial sum by each tfidf vector
-        data = np.delete(data, 0, 1)
-        tfidf_vects = np.array(contenido_csv('recursos/tfidf_vectors.csv'.format(type_set)), dtype='f')
-        data = np.concatenate((tfidf_vects, data), axis=1)
+    data = getfeaturessample(type_set)
 
     print '\n--------------------------------------->>>>   EASY ENSEMBLE UNDERSAMPLING   ' \
           '<<<<-------------------------------------------'

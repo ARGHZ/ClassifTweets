@@ -4,7 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ClassifTweets.iml" filepath="$PROJECT_DIR$/.idea/ClassifTweets.iml" />
       <module fileurl="file://$PROJECT_DIR$/../CyberBullying/.idea/CyberBullying.iml" filepath="$PROJECT_DIR$/../CyberBullying/.idea/CyberBullying.iml" />
+      <module fileurl="file://$USER_HOME$/Dropbox/UANL/MtyTransit/.idea/MtyTransit (Copia en conflicto de jncarry-H67H2-M3 2016-02-27).iml" filepath="$USER_HOME$/Dropbox/UANL/MtyTransit/.idea/MtyTransit (Copia en conflicto de jncarry-H67H2-M3 2016-02-27).iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../GitHub/gtf-pddl/.idea/gtf-pddl.iml" filepath="$PROJECT_DIR$/../../GitHub/gtf-pddl/.idea/gtf-pddl.iml" />
       <module fileurl="file://$USER_HOME$/Dropbox/UANL/PSA/python27/.idea/python27.iml" filepath="$USER_HOME$/Dropbox/UANL/PSA/python27/.idea/python27.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../web/.idea/web.iml" filepath="$PROJECT_DIR$/../web/.idea/web.iml" />
     </modules>
   </component>
 </project>
