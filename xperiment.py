@@ -29,4 +29,4 @@ if __name__ == '__main__':
             machinelearning(t_data)
         except IOError as e:
             print 'El archivo {} no fue encontrado'.format(t_data)
-    getfeaturessample()
+    #getfeaturessample()
