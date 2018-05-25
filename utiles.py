@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import csv
+
 __author__ = 'Juan David Carrillo López'
 
 import socket
@@ -34,7 +36,7 @@ def quitaracentos(simbolo_char):
 def leerarchivo(path_archivo):
     contenido = []
     
-    f = open(path_archivo)
+    f = open(path_archivo, encoding='utf-8')
     linea = f.readline()
     
     while linea != "":
@@ -45,6 +47,18 @@ def leerarchivo(path_archivo):
     f.close()
     
     return contenido
+
+
+def contenido_csv(path_archivo):
+    # Obtenemos los datos para probar la RNA
+    with open(path_archivo, 'r') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+
+        data = []
+        for row in spamreader:
+            data.append(tuple(row))
+
+    return tuple(data)
 
 
 def guardararchivo(info_arr, path_archivo, modo='w'):
