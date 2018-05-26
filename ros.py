@@ -9,10 +9,11 @@ from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
-from unbalanced_dataset.over_sampling import OverSampler
+from imblearn.over_sampling import RandomOverSampler
 import numpy as np
 
 from utiles import contenido_csv, binarizearray, guardar_csv
+from mining import getfeaturessample
 
 __author__ = 'Juan David Carrillo López'
 
@@ -66,14 +67,14 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[], specific_clf=[]):
             x = min_max_scaler.fit_transform(training_set[:, :features_space.shape[1] - 1])
             scaled_test_set = min_max_scaler.fit_transform(test_set[:, :features_space.shape[1] - 1])
 
-            ovsampling = OverSampler(verbose=True)
+            ovsampling = RandomOverSampler()
             if type_clf == 'binary':
                 y = np.array(binarizearray(training_set[:, features_space.shape[1] - 1:].ravel()))
                 y_true = np.array(binarizearray(test_set[:, features_space.shape[1] - 1:].ravel()))
             else:
                 y = training_set[:, features_space.shape[1] - 1:].ravel()
                 y_true = test_set[:, features_space.shape[1] - 1:].ravel()
-            rox, roy = ovsampling.fit_transform(x, y)
+            rox, roy = ovsampling.fit_sample(x, y)
 
             for i_clf, (clf_name, clf) in enumerate(classifiers.items()):
                 actual_clf = '{}_{}_ros_{}'.format(type_dataset, type_clf, clf_name)

@@ -15,7 +15,9 @@ import numpy as np
 from utiles import leerarchivo, guardar_csv, contenido_csv, binarizearray
 
 from mining import readexceldata, preprocessdataset, getfeaturessample
-from kfolds import machinelearning
+from kfolds import machinelearning as kfolds_machinelearning
+from ros import machinelearning as ros_machinelearning
+from eensemble import machinelearning as ee_machinelearning
 
 __author__ = 'Juan David Carrillo López'
 
@@ -26,7 +28,8 @@ if __name__ == '__main__':
     # preprocessdataset()
     for t_data in ('rand_nongrams', 'rand_ngrams', 'nongrams', 'ngrams'):
         try:
-            machinelearning(t_data)
+            # kfolds_machinelearning(t_data)
+            ros_machinelearning(t_data)
         except IOError as e:
             print 'El archivo {} no fue encontrado'.format(t_data)
     #getfeaturessample()

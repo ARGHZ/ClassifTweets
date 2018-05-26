@@ -6,10 +6,11 @@ from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
 from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
-from unbalanced_dataset.ensemble_sampling import EasyEnsemble
+from imblearn.ensemble.easy_ensemble import EasyEnsemble
 import numpy as np
 
 from utiles import contenido_csv, guardar_csv, votingoutputs, binarizearray
+from mining import getfeaturessample
 
 __author__ = 'Juan David Carrillo López'
 
@@ -50,7 +51,7 @@ def learningtoclassify(type_dataset, n_iter=1, data_set=[]):
                 y = np.array(binarizearray(training_set[:, features_space.shape[1] - 1:].ravel()))
                 y_true = binarizearray(test_set[:, features_space.shape[1] - 1:].ravel())
             easyens = EasyEnsemble(verbose=True)
-            eex, eey = easyens.fit_transform(x, y)
+            eex, eey = easyens.fit_sample(x, y)
 
             ciclo, target_names = 0, ('class 1', 'class 2', 'class 3')
             #  for train_ind, test_ind in kf_total:
